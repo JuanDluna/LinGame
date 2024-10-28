@@ -1,0 +1,13 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.LinGame" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimaryVariant">@color/generalWhite</item>
+        <item name="colorPrimary">@color/primaryWhite</item>
+        <item name="colorSecondary">@color/secundaryWhite</item>
+        <item name="textAppearanceBody1">@color/textPrimaryWhite</item>
+        <item name="textAppearanceBody2">@color/textSecundaryWhite</item>
+        <item name="colorAccent">@color/warningWhite</item>
+    </style>
+
+    <style name="Theme.LinGame" parent="Base.Theme.LinGame" />
+</resources>

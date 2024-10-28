@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Paleta de colores tema claro    -->
+    <color name="generalWhite">#F5F5F5</color>
+    <color name="primaryWhite">#4A90E2</color>
+    <color name="secundaryWhite">#7ED321</color>
+    <color name="textPrimaryWhite">#4A4A4A</color>
+    <color name="textSecundaryWhite">#9B9B9B</color>
+    <color name="warningWhite">#FF6A6A</color>
+
+    <!-- Paleta de colores tema oscuro    -->
+    <color name="generalBlack">#000000</color>
+    <color name="primaryBlack">#1E88E5</color>
+    <color name="secundaryBlack">#66BB6A</color>
+    <color name="textPrimaryBlack">#E0E0E0</color>
+    <color name="textSecundaryBlack">#B0BEC5</color>
+    <color name="warningBlack">#EF5350</color>
+</resources>
