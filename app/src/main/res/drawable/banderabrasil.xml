@@ -1,0 +1,23 @@
+<!-- res/drawable/flag_brazil.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="300dp"
+    android:height="200dp"
+    android:viewportWidth="300"
+    android:viewportHeight="200">
+
+    <!-- Fondo verde -->
+    <path
+        android:fillColor="#009739"
+        android:pathData="M0,0h300v200H0z"/>
+
+    <!-- Rombo amarillo (representando el diamante) -->
+    <path
+        android:fillColor="#FFCC29"
+        android:pathData="M150,10L290,100L150,190L10,100Z"/>
+
+    <!-- Círculo azul en el centro -->
+    <path
+        android:fillColor="#3E4095"
+        android:pathData="M150,100m-45,0a45,45 0 1,0 90,0a45,45 0 1,0 -90,0"/>
+
+</vector>

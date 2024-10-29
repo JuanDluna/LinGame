@@ -7,6 +7,7 @@
         <item name="textAppearanceBody1">@color/textPrimaryBlack</item>
         <item name="textAppearanceBody2">@color/textSecundaryBlack</item>
         <item name="colorAccent">@color/warningBlack</item>
+        <item name="fontFamily">@font/howdy_lemon</item>
     </style>
 
     <style name="Theme.LinGame" parent="Base.Theme.LinGame" />
