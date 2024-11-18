@@ -1,0 +1,22 @@
+<!-- res/drawable/flag_france.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="300dp"
+    android:height="200dp"
+    android:viewportWidth="300"
+    android:viewportHeight="200">
+
+    <!-- Sección azul -->
+    <path
+        android:fillColor="#002395"
+        android:pathData="M0,0h100v200h-100z"/>
+
+    <!-- Sección blanca -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M100,0h100v200h-100z"/>
+
+    <!-- Sección roja -->
+    <path
+        android:fillColor="#ED2939"
+        android:pathData="M200,0h100v200h-100z"/>
+</vector>

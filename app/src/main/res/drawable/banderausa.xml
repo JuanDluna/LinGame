@@ -1,0 +1,94 @@
+<!-- res/drawable/flag_usa.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="300dp"
+    android:height="200dp"
+    android:viewportWidth="300"
+    android:viewportHeight="200">
+
+    <!-- Fondo rojo con franjas blancas -->
+    <path
+        android:fillColor="#B22234"
+        android:pathData="M0,0h300v200H0z"/>
+
+    <!-- Franjas blancas (13 franjas en total, 7 rojas y 6 blancas) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M0,15h300v15H0z M0,45h300v15H0z M0,75h300v15H0z
+                         M0,105h300v15H0z M0,135h300v15H0z M0,165h300v15H0z"/>
+
+    <!-- Cuadro azul en la esquina superior izquierda (campo de estrellas) -->
+    <path
+        android:fillColor="#3C3B6E"
+        android:pathData="M0,0h120v105H0z"/>
+
+    <!-- Estrellas blancas (9 filas de estrellas, alternando 6 y 5 estrellas por fila) -->
+    <group>
+        <!-- Fila 1 -->
+        <path android:fillColor="#FFFFFF" android:pathData="M10,10m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M30,10m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M50,10m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M70,10m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M90,10m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M110,10m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+
+        <!-- Fila 2 -->
+        <path android:fillColor="#FFFFFF" android:pathData="M20,20m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M40,20m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M60,20m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M80,20m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M100,20m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+
+        <!-- Fila 3 -->
+        <path android:fillColor="#FFFFFF" android:pathData="M10,30m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M30,30m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M50,30m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M70,30m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M90,30m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M110,30m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+
+        <!-- Fila 4 -->
+        <path android:fillColor="#FFFFFF" android:pathData="M20,40m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M40,40m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M60,40m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M80,40m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M100,40m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+
+        <!-- Fila 5 -->
+        <path android:fillColor="#FFFFFF" android:pathData="M10,50m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M30,50m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M50,50m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M70,50m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M90,50m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M110,50m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+
+        <!-- Fila 6 -->
+        <path android:fillColor="#FFFFFF" android:pathData="M20,60m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M40,60m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M60,60m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M80,60m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M100,60m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+
+        <!-- Fila 7 -->
+        <path android:fillColor="#FFFFFF" android:pathData="M10,70m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M30,70m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M50,70m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M70,70m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M90,70m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M110,70m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+
+        <!-- Fila 8 -->
+        <path android:fillColor="#FFFFFF" android:pathData="M20,80m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M40,80m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M60,80m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M80,80m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M100,80m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+
+        <!-- Fila 9 -->
+        <path android:fillColor="#FFFFFF" android:pathData="M10,90m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M30,90m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M50,90m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M70,90m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M90,90m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M110,90m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"/>
+    </group>
+</vector>
