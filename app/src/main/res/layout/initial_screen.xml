@@ -9,11 +9,12 @@
 
     <ImageButton
         android:id="@+id/btnSettings"
-        android:layout_width="30dp"
-        android:layout_height=""
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:src="@drawable/baseline_settings_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="20dp"
         android:backgroundTint="@android:color/transparent" />
 
     <ImageView
