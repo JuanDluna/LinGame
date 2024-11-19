@@ -22,7 +22,7 @@ class LoginActivity : AppCompatActivity() {
         etCorreo = findViewById(R.id.etCorreo)
         etContrasena = findViewById(R.id.etContrasena)
         btnIniciarSesion = findViewById(R.id.btnIniciar)
-        btnRegresar = findViewById(R.id.ibRegresar)
+        btnRegresar = findViewById(R.id.btnRegresar)
         btnFacebook = findViewById(R.id.ibFacebook)
 
         // Evento para el botón "Iniciar Sesión"

@@ -12,7 +12,7 @@
         <item name="android:background">@drawable/edit_text_background</item>
         <item name="android:padding">10dp</item> <!-- Espacio interno del texto -->
         <item name="android:textColor">?attr/textAppearanceBody1</item> <!-- Color del texto dinámico -->
-        <item name="android:textSize">16sp</item> <!-- Tamaño del texto -->
+        <item name="android:textSize">24dp</item> <!-- Tamaño del texto -->
     </style>
 
     <style name="Rounded" parent="Widget.AppCompat.Button">
