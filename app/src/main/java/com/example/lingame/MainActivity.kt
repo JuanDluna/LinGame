@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         btnIniciarSesion.setOnClickListener {
             // Navegar a la pantalla de inicio de sesión
-//            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
 
