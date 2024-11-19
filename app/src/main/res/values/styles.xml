@@ -2,9 +2,17 @@
 <resources>
     <!-- Estilo para encabezados H1 -->
     <style name="TextAppearance.LinGame.H1" parent="TextAppearance.Material3.HeadlineLarge">
-        <item name="android:textSize">32dp</item>
+        <item name="android:textSize">52dp</item>
         <item name="android:textColor">?attr/colorSecondary</item>
         <item name="android:fontFamily">@font/howdy_lemon</item>
         <item name="android:textStyle">bold</item>
     </style>
+
+    <style name="RoundedEditText" parent="Widget.Material3.TextInputEditText.OutlinedBox">
+        <item name="android:background">@drawable/edit_text_background</item>
+        <item name="android:padding">10dp</item> <!-- Espacio interno del texto -->
+        <item name="android:textColor">?attr/textAppearanceBody1</item> <!-- Color del texto dinámico -->
+        <item name="android:textSize">16sp</item> <!-- Tamaño del texto -->
+    </style>
+
 </resources>
