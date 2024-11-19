@@ -15,4 +15,10 @@
         <item name="android:textSize">16sp</item> <!-- Tamaño del texto -->
     </style>
 
+    <style name="Rounded" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/rounded_style</item>
+        <item name="android:textColor">?attr/textAppearanceBody1</item> <!-- Color del texto -->
+        <item name="android:textSize">16sp</item> <!-- Tamaño del texto -->
+    </style>
+
 </resources>

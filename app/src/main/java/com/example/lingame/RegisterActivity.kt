@@ -1,5 +1,6 @@
 package com.example.lingame
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -44,10 +45,10 @@ class RegisterActivity : AppCompatActivity() {
             } else if (contrasena != confirmarContrasena) {
                 Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
             } else {
-                // Aquí agregarías la lógica de registro del usuario
-                // Por ejemplo, podrías pasar a la siguiente actividad
                 Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
                 // Intent para cambiar de actividad o realizar otro proceso
+                var intent = Intent(this, LanguageSelectionActivity::class.java)
+                startActivity(intent)
             }
         }
 
