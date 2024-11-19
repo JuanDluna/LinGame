@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Estilo para encabezados H1 -->
+    <style name="TextAppearance.LinGame.H1" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:textSize">32dp</item>
+        <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="android:fontFamily">@font/howdy_lemon</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>
