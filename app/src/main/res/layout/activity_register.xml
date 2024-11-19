@@ -4,7 +4,9 @@
     android:layout_height="match_parent"
     android:id="@+id/register_layout">
 
+    <!-- Botón Regresar -->
     <ImageButton
+        android:id="@+id/btnRegresar"
         android:layout_width="43dp"
         android:layout_height="46dp"
         android:backgroundTint="@android:color/transparent"
@@ -12,19 +14,21 @@
         app:layout_constraintEnd_toStartOf="@id/tvBienvenido"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="55dp"/>
+        android:layout_marginTop="40dp"/>
 
+    <!-- Título Bienvenida -->
     <TextView
         android:id="@+id/tvBienvenido"
         style="@style/TextAppearance.LinGame.H1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:text="¡Bienvenido!"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <!-- Avatar -->
     <ImageView
         android:id="@+id/ivAvatar"
         android:layout_width="200dp"
@@ -32,63 +36,100 @@
         android:src="@drawable/avatar_base"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvBienvenido" />
+        app:layout_constraintTop_toBottomOf="@id/tvBienvenido"
+        android:layout_marginTop="30dp"/>
 
+    <ImageButton
+        android:id="@+id/btnCambiarAvatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/add_circle"
+        android:backgroundTint="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="@id/ivAvatar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/ivAvatar"/>
+
+    <!-- Nombre -->
     <EditText
         android:id="@+id/etNombre"
         style="@style/RoundedEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
         android:hint="Nombre"
+        android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ivAvatar" />
 
+    <!-- Correo Electrónico -->
     <EditText
         android:id="@+id/etCorreo"
         style="@style/RoundedEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
         android:hint="Correo electrónico"
+        android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etNombre" />
 
+    <!-- Contraseña -->
     <EditText
         android:id="@+id/etContrasena"
         style="@style/RoundedEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
         android:hint="Contraseña"
+        android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etCorreo" />
 
+    <!-- Confirmar Contraseña -->
     <EditText
         android:id="@+id/etConfirmarContrasena"
         style="@style/RoundedEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
         android:hint="Confirmar contraseña"
+        android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etContrasena" />
 
+    <!-- Botón Registrar -->
     <Button
-        android:id="@+id/btnRegistrar"
-        android:layout_width="0dp"
+        android:id="@+id/btnComencemos"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Registrar"
+        android:text="¡Comencemos!"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etConfirmarContrasena" />
+        app:layout_constraintTop_toBottomOf="@id/etConfirmarContrasena"
+        android:textColor="@android:color/white" />
 
-    
-
+    <ImageButton
+        android:id="@+id/btnFacebook"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/btnComencemos"
+        android:src="@drawable/facebook_logo"
+        android:backgroundTint="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
