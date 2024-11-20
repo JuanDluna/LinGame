@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.lingame" />
+                  <option name="mobileSdkAppId" value="1:908231657827:android:712f049f4c5dc9cedfab56" />
+                  <option name="projectId" value="db-ling" />
+                  <option name="projectNumber" value="908231657827" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

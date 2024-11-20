@@ -7,6 +7,7 @@
         <item name="textAppearanceBody1">@color/textPrimaryWhite</item>
         <item name="textAppearanceBody2">@color/textSecundaryWhite</item>
         <item name="colorAccent">@color/warningWhite</item>
+        <item name="contrast">@color/generalBlack</item>
         <item name="fontFamily">@font/howdy_lemon</item>
     </style>
 
