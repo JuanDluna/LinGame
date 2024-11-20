@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "908231657827",
+    "firebase_url": "https://db-ling-default-rtdb.firebaseio.com",
+    "project_id": "db-ling",
+    "storage_bucket": "db-ling.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:908231657827:android:712f049f4c5dc9cedfab56",
+        "android_client_info": {
+          "package_name": "com.example.lingame"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBivWiK8EceJMNL7Hni2SzIqQYw_8iSrZQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
