@@ -71,13 +71,21 @@
         android:layout_marginTop="12dp"
         android:layout_gravity="center"/>
 
-    <ImageButton
-        android:id="@+id/ibFacebook"
+<!--    <ImageButton-->
+<!--        android:id="@+id/ibFacebook"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="12dp"-->
+<!--        android:src="@drawable/facebook_logo"-->
+<!--        android:backgroundTint="@android:color/transparent"-->
+<!--        android:layout_gravity="center"/>-->
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/btnFacebook"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:src="@drawable/facebook_logo"
-        android:backgroundTint="@android:color/transparent"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"/>
 
 </LinearLayout>

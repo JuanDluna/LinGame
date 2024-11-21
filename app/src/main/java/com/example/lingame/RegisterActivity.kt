@@ -7,8 +7,23 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginResult
+import com.facebook.login.widget.LoginButton
+import com.google.firebase.firestore.FirebaseFirestore
+import java.util.Arrays
+
 
 class RegisterActivity : AppCompatActivity() {
+
+    // Variable para Base de datos de Firebase
+
+    private val db = FirebaseFirestore.getInstance()
+
+    // Variable para Facebook
+    private val callbackManager = CallbackManager.Factory.create()
 
     // Definir las vistas
     private lateinit var etNombre: EditText
@@ -17,7 +32,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var etConfirmarContrasena: EditText
     private lateinit var btnComencemos: Button
     private lateinit var btnRegresar: ImageButton
-    private lateinit var btnFacebook: ImageButton
+    private lateinit var btnFacebook: LoginButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +45,7 @@ class RegisterActivity : AppCompatActivity() {
         etConfirmarContrasena = findViewById(R.id.etConfirmarContrasena)
         btnComencemos = findViewById(R.id.btnComencemos)
         btnRegresar = findViewById(R.id.btnRegresar)
-        btnFacebook = findViewById(R.id.btnFacebook)
+        btnFacebook = findViewById(R.id.btnFacebook);
 
         // Evento para el botón "¡Comencemos!"
         btnComencemos.setOnClickListener {
@@ -45,6 +60,16 @@ class RegisterActivity : AppCompatActivity() {
             } else if (contrasena != confirmarContrasena) {
                 Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
             } else {
+                // Registro exitoso
+
+                // Guardar los datos en la base de datos
+                db.collection("users").document(correo).set(
+                    hashMapOf(
+                        "name" to nombre,
+                        "email" to correo,
+                        "password" to contrasena
+                    )
+                )
                 Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
                 // Intent para cambiar de actividad o realizar otro proceso
                 var intent = Intent(this, LanguageSelectionActivity::class.java)
@@ -55,13 +80,28 @@ class RegisterActivity : AppCompatActivity() {
         // Evento para el botón "Regresar" (Imagen)
         btnRegresar.setOnClickListener {
             // Regresar a la actividad anterior
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
 
         // Evento para el botón de Facebook (Imagen)
-        btnFacebook.setOnClickListener {
-            // Implementar acción para logueo con Facebook o lo que sea necesario
-            Toast.makeText(this, "Login con Facebook no implementado aún", Toast.LENGTH_SHORT).show()
-        }
+        btnFacebook.setReadPermissions(Arrays.asList("email", "public_profile"))
+
+
+        // If you are using in a fragment, call loginButton.setFragment(this);
+
+        // Callback registration
+        btnFacebook.registerCallback(callbackManager, object : FacebookCallback<LoginResult?> {
+            override fun onSuccess(loginResult: LoginResult?) {
+                // App code
+            }
+
+            override fun onCancel() {
+                // App code
+            }
+
+            override fun onError(exception: FacebookException) {
+                // App code
+            }
+        })
     }
 }
