@@ -76,6 +76,8 @@ class LoginActivity : AppCompatActivity() {
                             Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
                             val user = firebaseAuth.currentUser
                             updateUI(user)
+
+                           //TODO aquí lógica para navegar a la actividad de juego
                         } else {
                             Toast.makeText(
                                 this,

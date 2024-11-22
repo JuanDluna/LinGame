@@ -1,5 +1,6 @@
 package com.example.lingame
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.CheckBox
 import android.widget.ImageButton
@@ -37,6 +38,9 @@ class LanguageSelectionActivity : AppCompatActivity() {
             if (selectedLanguages.isNotEmpty()) {
                 val languages = selectedLanguages.joinToString(", ")
                 Toast.makeText(this, "Idiomas seleccionados: $languages", Toast.LENGTH_SHORT).show()
+
+                val intent = Intent(this, TutorialActivity::class.java)
+                startActivity(intent)
             } else {
                 Toast.makeText(this, "No has seleccionado ningún idioma", Toast.LENGTH_SHORT).show()
             }
