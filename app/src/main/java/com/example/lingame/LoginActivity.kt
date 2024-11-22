@@ -44,7 +44,8 @@ class LoginActivity : AppCompatActivity() {
         callbackManager = CallbackManager.Factory.create()
 
         // Configurar LoginButton de Facebook
-        btnFacebook.setReadPermissions(listOf("email", "public_profile"))
+        btnFacebook.setPermissions(listOf("email", "public_profile"))
+
         btnFacebook.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
             override fun onSuccess(loginResult: LoginResult) {
                 // Manejar inicio de sesión exitoso

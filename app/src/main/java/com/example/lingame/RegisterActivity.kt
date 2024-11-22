@@ -12,15 +12,13 @@ import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Arrays
 
 
 class RegisterActivity : AppCompatActivity() {
 
-    // Variable para Base de datos de Firebase
-
-    private val db = FirebaseFirestore.getInstance()
 
     // Variable para Facebook
     private val callbackManager = CallbackManager.Factory.create()
@@ -54,28 +52,44 @@ class RegisterActivity : AppCompatActivity() {
             val contrasena = etContrasena.text.toString().trim()
             val confirmarContrasena = etConfirmarContrasena.text.toString().trim()
 
-            // Validar los campos (ejemplo básico)
+            // Validar los campos
             if (nombre.isEmpty() || correo.isEmpty() || contrasena.isEmpty() || confirmarContrasena.isEmpty()) {
                 Toast.makeText(this, "Todos los campos son obligatorios", Toast.LENGTH_SHORT).show()
             } else if (contrasena != confirmarContrasena) {
                 Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
             } else {
-                // Registro exitoso
+                // Crear un nuevo usuario con Firebase Authentication
+                FirebaseAuth.getInstance().createUserWithEmailAndPassword(correo, contrasena)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            // Obtener el UID del usuario registrado
+                            val userId = task.result?.user?.uid
 
-                // Guardar los datos en la base de datos
-                db.collection("users").document(correo).set(
-                    hashMapOf(
-                        "name" to nombre,
-                        "email" to correo,
-                        "password" to contrasena
-                    )
-                )
-                Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
-                // Intent para cambiar de actividad o realizar otro proceso
-                var intent = Intent(this, LanguageSelectionActivity::class.java)
-                startActivity(intent)
+                            // Guardar información adicional del usuario en Firestore
+                            if (userId != null) {
+                                val db = FirebaseFirestore.getInstance()
+                                db.collection("users").document(userId).set(
+                                    hashMapOf(
+                                        "name" to nombre,
+                                        "email" to correo
+                                    )
+                                ).addOnSuccessListener {
+                                    Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                                    // Navegar a la siguiente actividad
+                                    val intent = Intent(this, LanguageSelectionActivity::class.java)
+                                    startActivity(intent)
+                                }.addOnFailureListener { e ->
+                                    Toast.makeText(this, "Error al guardar datos: ${e.message}", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } else {
+                            // Mostrar mensaje de error si el registro falla
+                            Toast.makeText(this, "Error al registrar: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
             }
         }
+
 
         // Evento para el botón "Regresar" (Imagen)
         btnRegresar.setOnClickListener {
