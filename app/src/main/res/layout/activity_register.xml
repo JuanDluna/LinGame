@@ -39,7 +39,7 @@
         app:layout_constraintTop_toBottomOf="@id/tvBienvenido"
         android:layout_marginTop="30dp"/>
 
-    <ImageButton
+    <ImageView
         android:id="@+id/btnCambiarAvatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -122,26 +122,27 @@
         app:layout_constraintTop_toBottomOf="@id/etConfirmarContrasena"
         android:textColor="@android:color/white" />
 
-<!--    <ImageButton-->
-<!--        android:id="@+id/btnFacebook"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:src="@drawable/facebook_logo"-->
-<!--        android:backgroundTint="@android:color/transparent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/btnComencemos"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"/>-->
-
-
-    <com.facebook.login.widget.LoginButton
+    <ImageButton
         android:id="@+id/btnFacebook"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp"
+        android:src="@drawable/facebook_logo"
+        android:backgroundTint="@android:color/transparent"
         app:layout_constraintTop_toBottomOf="@id/btnComencemos"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+
+<!--    <com.facebook.login.widget.LoginButton-->
+<!--        android:id="@+id/btnFacebook"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:foreground="@drawable/facebook_logo"-->
+<!--        android:backgroundTint="@android:color/transparent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/btnComencemos"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"/>-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>

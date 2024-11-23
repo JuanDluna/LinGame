@@ -7,15 +7,7 @@
     android:layout_height="match_parent">
 
 
-    <ImageButton
-        android:id="@+id/btnSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/baseline_settings_24"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="20dp"
-        android:backgroundTint="@android:color/transparent" />
+
 
     <ImageView
         android:id="@+id/logoLinGame"
@@ -24,7 +16,7 @@
         android:src="@drawable/logolingame2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnSettings"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/btnComienza"
         app:layout_constraintDimensionRatio="H,4:4"
         />
@@ -41,7 +33,8 @@
         app:layout_constraintBottom_toTopOf="@+id/btnIniciarSesion"
         android:text="¡Comienza!"
         android:textSize="40dp"
-        />
+        android:backgroundTint="?attr/colorPrimary"
+        android:textColor="?attr/colorPrimaryVariant"/>
 
     <Button
         android:id="@+id/btnIniciarSesion"
@@ -53,8 +46,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:text="Inicia sesión"
         android:textSize="40dp"
-        android:backgroundTint="@color/generalWhite"
-        android:textColor="@color/primaryWhite" />
+        android:backgroundTint="?attr/colorPrimaryVariant"
+        android:textColor="?attr/colorPrimary" />
 
 
 

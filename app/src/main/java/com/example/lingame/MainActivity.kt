@@ -18,7 +18,6 @@ class MainActivity : AppCompatActivity() {
         // Referencias a los elementos de la vista
         val btnComienza: Button = findViewById(R.id.btnComienza)
         val btnIniciarSesion: Button = findViewById(R.id.btnIniciarSesion)
-        val btnSettings: ImageButton = findViewById(R.id.btnSettings)
 
         // Configurar listeners para los botones
         btnComienza.setOnClickListener {
@@ -33,11 +32,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        btnSettings.setOnClickListener {
-            // Navegar a la pantalla de configuración
-//            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-        }
     }
 
 
