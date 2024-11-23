@@ -1,0 +1,93 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Fondo del juego -->
+    <SurfaceView
+        android:id="@+id/gameSurfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- HUD superpuesto -->
+    <LinearLayout
+        android:id="@+id/hudContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginHorizontal="12dp"
+        android:gravity="top"
+        android:background="@android:color/transparent">
+
+        <!-- Fotografía del jugador y barra de experiencia -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Foto del jugador -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/playerAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/avatar_base"
+                android:background="@color/generalWhite"
+                app:shapeAppearanceOverlay="@style/RoundedCornerImage"
+                android:contentDescription="Player Avatar"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/playerLevel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nivel: 1"
+                android:textSize="14sp"
+                android:textColor="@android:color/white" />
+            <!-- Nivel del jugador -->
+
+            <!-- Barra de experiencia -->
+            <ProgressBar
+                android:id="@+id/experienceBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progress="25"
+                android:progressDrawable="@drawable/progress_horizontal"
+                style="?android:attr/progressBarStyleHorizontal" />
+
+            <!-- Botón de selección de idioma (centrado verticalmente) -->
+            <com.example.lingame.ButtonDropdownMenu
+                android:id="@+id/languageSelector"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:spinnerMode="dropdown"
+                android:layout_marginTop="48dp"
+                android:src="@drawable/banderamexico"
+                android:background="@color/generalWhite"
+                app:shapeAppearanceOverlay="@style/RoundedCornerImage"
+                android:tooltipText="Selecciona un idioma"
+                android:contentDescription="Language Selector"/>
+        </LinearLayout>
+
+        <!-- Espaciador para separar elementos -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="false"
+            android:focusable="false" />
+
+        <!-- Botón de menú desplegable -->
+        <com.example.lingame.ButtonDropdownMenu
+            android:id="@+id/menuButton"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@android:drawable/menu_frame"
+            android:contentDescription="Menu Button"
+            android:background="@color/generalWhite"/>
+    </LinearLayout>
+</FrameLayout>

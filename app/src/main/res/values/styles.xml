@@ -21,4 +21,12 @@
         <item name="android:textSize">16sp</item> <!-- Tamaño del texto -->
     </style>
 
+    <style name="RoundedCornerImage" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+        <item name="android:background">@color/generalWhite</item>
+    </style>
+
+
+
 </resources>

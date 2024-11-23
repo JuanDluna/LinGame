@@ -2,6 +2,7 @@ package com.example.lingame
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -49,8 +50,10 @@ class LoginActivity : AppCompatActivity() {
             if (correo.isEmpty() || contrasena.isEmpty()) {
                 showToast("Por favor, llena todos los campos")
             } else {
+                Log.d("LoginActivity", "Intentando iniciar sesión con correo: $correo")
                 firebaseAuth.signInWithEmailAndPassword(correo, contrasena)
                     .addOnCompleteListener { task ->
+                        Log.d("LoginActivity", "signInWithEmailAndPassword:onComplete:${task.isSuccessful}")
                         if (task.isSuccessful) {
                             navigateToMain(firebaseAuth.currentUser)
                         } else {
