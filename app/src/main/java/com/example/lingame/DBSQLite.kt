@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     // Uso de base de datos local en caso de que no se pueda acceder a Firebase
@@ -145,6 +146,8 @@ class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         englishLevel: Map<String, Int>,
         frenchLevel: Map<String, Int>,
         portugueseLevel: Map<String, Int>) {
+
+        Log.d("DBSQLite", "Actualizando datos de la base de datos")
         val db = this.writableDatabase
         val userValues = ContentValues().apply {
             put(COLUMN_NAME, name)
@@ -155,44 +158,66 @@ class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         val userResult = db.update(
             TABLE_USERS, userValues, "$COLUMN_ID = ?", arrayOf(UID)
         )
+
+        Log.d("DBSQLite", "Resultado de actualizacion : ${userResult}")
         if (userResult > 0) {
-            val englishValues = ContentValues().apply {
-                put(COLUMN_ID, UID)
-                put(COLUMN_LEVEL_CREA_HISTORIA, englishLevel[COLUMN_LEVEL_CREA_HISTORIA])
-                put(COLUMN_LEVEL_RR, englishLevel[COLUMN_LEVEL_RR])
-                put(COLUMN_LEVEL_TRADUCELO, englishLevel[COLUMN_LEVEL_TRADUCELO])
-                put(COLUMN_LEVEL_PARAFRASEA, englishLevel[COLUMN_LEVEL_PARAFRASEA])
-            }
-            val frenchValues = ContentValues().apply {
-                put(COLUMN_ID, UID)
-                put(COLUMN_LEVEL_CREA_HISTORIA, frenchLevel[COLUMN_LEVEL_CREA_HISTORIA])
-                put(COLUMN_LEVEL_RR, frenchLevel[COLUMN_LEVEL_RR])
-                put(COLUMN_LEVEL_TRADUCELO, frenchLevel[COLUMN_LEVEL_TRADUCELO])
-                put(COLUMN_LEVEL_PARAFRASEA, frenchLevel[COLUMN_LEVEL_PARAFRASEA])
-            }
-            val portugueseValues = ContentValues().apply {
-                put(COLUMN_ID, UID)
-                put(COLUMN_LEVEL_CREA_HISTORIA, portugueseLevel[COLUMN_LEVEL_CREA_HISTORIA])
-                put(COLUMN_LEVEL_RR, portugueseLevel[COLUMN_LEVEL_RR])
-                put(COLUMN_LEVEL_TRADUCELO, portugueseLevel[COLUMN_LEVEL_TRADUCELO])
-                put(COLUMN_LEVEL_PARAFRASEA, portugueseLevel[COLUMN_LEVEL_PARAFRASEA])
-            }
-            try {
-                db.insert(TABLE_ENGLISH, null, englishValues)
-                db.insert(TABLE_FRENCH, null, frenchValues)
-                db.insert(TABLE_PORTUGUESE, null, portugueseValues)
-            } catch (e: Exception) {
-                e.printStackTrace()
+            when{
+                englishLevel.isNotEmpty() -> {
+                    Log.d("DBSQLite", "Actualizando tabla de ingles")
+                    val englishValues = ContentValues().apply {
+                        put(COLUMN_ID, UID)
+                        put(COLUMN_LEVEL_CREA_HISTORIA, englishLevel[COLUMN_LEVEL_CREA_HISTORIA])
+                        put(COLUMN_LEVEL_RR, englishLevel[COLUMN_LEVEL_RR])
+                        put(COLUMN_LEVEL_TRADUCELO, englishLevel[COLUMN_LEVEL_TRADUCELO])
+                        put(COLUMN_LEVEL_PARAFRASEA, englishLevel[COLUMN_LEVEL_PARAFRASEA])
+                    }
+                    db.insert(TABLE_ENGLISH, null, englishValues)
+                }
+
+                portugueseLevel.isNotEmpty() ->{
+                    Log.d("DBSQLite", "Actualizando tabla de portugues")
+                    val portugueseValues = ContentValues().apply {
+                        put(COLUMN_ID, UID)
+                        put(COLUMN_LEVEL_CREA_HISTORIA, portugueseLevel[COLUMN_LEVEL_CREA_HISTORIA])
+                        put(COLUMN_LEVEL_RR, portugueseLevel[COLUMN_LEVEL_RR])
+                        put(COLUMN_LEVEL_TRADUCELO, portugueseLevel[COLUMN_LEVEL_TRADUCELO])
+                        put(COLUMN_LEVEL_PARAFRASEA, portugueseLevel[COLUMN_LEVEL_PARAFRASEA])
+                    }
+                    db.insert(TABLE_PORTUGUESE, null, portugueseValues)
+                }
+                frenchLevel.isNotEmpty() ->{
+                    Log.d("DBSQLite", "Actualizando tabla de frances")
+                    val frenchValues = ContentValues().apply {
+                        put(COLUMN_ID, UID)
+                        put(COLUMN_LEVEL_CREA_HISTORIA, frenchLevel[COLUMN_LEVEL_CREA_HISTORIA])
+                        put(COLUMN_LEVEL_RR, frenchLevel[COLUMN_LEVEL_RR])
+                        put(COLUMN_LEVEL_TRADUCELO, frenchLevel[COLUMN_LEVEL_TRADUCELO])
+                        put(COLUMN_LEVEL_PARAFRASEA, frenchLevel[COLUMN_LEVEL_PARAFRASEA])
+                    }
+                    db.insert(TABLE_FRENCH, null, frenchValues)
+                }
             }
         }
     }
 
     fun getUserData(UID: String): Cursor? {
         val db = this.readableDatabase
-        return db.rawQuery("SELECT * FROM $TABLE_USERS WHERE $COLUMN_ID = ?", arrayOf(UID))
+        val cursor = db.query(
+            TABLE_USERS,
+            arrayOf(COLUMN_ID, COLUMN_NAME, COLUMN_GENERAL_LEVEL, COLUMN_PHOTO_URL),
+            "$COLUMN_ID = ?",
+            arrayOf(UID),
+            null,
+            null,
+            null
+        )
+
+        Log.d("DBSQLite", "Datos a regresar de la consulta: ${cursor.count}")
+        return cursor
     }
 
-    // Método para verificar si un usuario existe
+
+    // Metodo para verificar si un usuario existe
     fun isUserExists(UID: String): Boolean {
         val db = this.readableDatabase
         val cursor = db.query(
@@ -206,6 +231,8 @@ class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         )
         val exists = cursor.count > 0
         cursor.close()
+        Log.d("DBSQLite", "Cantidad de campos obtenidos: ${cursor.count}")
+        Log.d("DBSQLite", "Existencia de usuario ${UID} en base de datos:${exists}")
         return exists
     }
 

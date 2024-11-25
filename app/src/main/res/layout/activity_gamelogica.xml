@@ -71,6 +71,7 @@
                 app:shapeAppearanceOverlay="@style/RoundedCornerImage"
                 android:tooltipText="Selecciona un idioma"
                 android:contentDescription="Language Selector"/>
+
         </LinearLayout>
 
         <!-- Espaciador para separar elementos -->
@@ -86,7 +87,7 @@
             android:id="@+id/menuButton"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:src="@android:drawable/menu_frame"
+            android:src="@drawable/menu_64"
             android:contentDescription="Menu Button"
             android:background="@drawable/dropdown_background" />
 

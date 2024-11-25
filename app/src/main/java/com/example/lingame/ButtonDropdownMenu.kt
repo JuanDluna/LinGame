@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.Gravity
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.appcompat.widget.AppCompatImageButton
@@ -42,7 +43,7 @@ class ButtonDropdownMenu : AppCompatImageButton {
             }
 
             options.forEach { (key, drawable) ->
-                val button = ImageButton(context).apply {
+                val button = ImageView(context).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         64.dpToPx(), // Tamaño fijo
                         64.dpToPx()

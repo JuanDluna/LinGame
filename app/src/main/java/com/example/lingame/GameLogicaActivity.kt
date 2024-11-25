@@ -1,7 +1,14 @@
 package com.example.lingame
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.Picture
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -57,35 +64,57 @@ class GameLogicaActivity : AppCompatActivity() {
         menuButton = findViewById(R.id.menuButton)
         languageSelector = findViewById(R.id.languageSelector)
 
+        val UID = preferences.getString(R.string.UID_Preferences.toString(), "")!!
+        Log.d("GameLogicaActivity", "Usuario logueado: ${UID}")
+
         var cursorDb: android.database.Cursor? = null
         try {
-            cursorDb = dbHelper.getUserData(preferences.getString("UID", "")!!)
+            cursorDb = dbHelper.getUserData(UID!!)
+            Log.d("GameLogicaActivity", "Cursor de la base de datos: ${cursorDb!!}")
         }catch (e: Exception){
             Log.d("GameLogicaActivity", "Error al obtener datos del usuario: ${e.message}")
         }
 
         if (cursorDb != null && cursorDb.moveToFirst()) {
             var level: Float? = null
-            var playerPhotoFile : File? = null
+            var playerPhotoURI: String? = null
+
             try {
                 level = cursorDb.getFloat(cursorDb.getColumnIndexOrThrow("generalLevel"))
-                val playerPhotoURI = cursorDb.getString(cursorDb.getColumnIndexOrThrow("photo_url"))
-                playerPhotoFile = File(playerPhotoURI)
-            }catch (e: Exception){
+                playerPhotoURI = cursorDb.getString(cursorDb.getColumnIndexOrThrow("photo_url"))
+            } catch (e: Exception) {
                 Log.d("GameLogicaActivity", "Error al obtener datos del usuario: ${e.message}")
             }
 
-            Log.d("GameLogicaActivity", "Level")
-            Log.d("GameLogicaActivity", "PlayerPhotoFile: $playerPhotoFile")
+            Log.d("GameLogicaActivity", "Level: $level")
+            Log.d("GameLogicaActivity", "PlayerPhotoFile: $playerPhotoURI")
 
+            if (!playerPhotoURI.isNullOrEmpty()) {
+                val photoFile = File(playerPhotoURI)
 
-//            playerAvatar.setImageURI(Uri.fromFile(playerPhotoFile))
-//            playerLevel.text = "Nivel: ${level!!.roundToInt()}"
-//            experienceBar.progress = ((level - level.toInt()) * 100).toInt()
+                if (photoFile.exists()) {
+                    try {
+                        val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+                        playerAvatar.setImageBitmap(bitmap)
+                        playerAvatar.setBackgroundColor(Color.WHITE)
+                        Log.d("GameLogicaActivity", "Imagen cargada correctamente en el avatar.")
+                    } catch (e: Exception) {
+                        Log.e("GameLogicaActivity", "Error al cargar la imagen: ${e.message}")
+                    }
+                } else {
+                    Log.d("GameLogicaActivity", "El archivo de imagen no existe en la ruta proporcionada.")
+                }
+            } else {
+                Log.d("GameLogicaActivity", "playerPhotoURI está vacío o nulo.")
+            }
 
-        }else{
+            // Configuración de nivel y barra de experiencia
+            playerLevel.text = "Nivel: ${level?.roundToInt() ?: "Desconocido"}"
+            experienceBar.progress = ((level ?: 0f - (level ?: 0f).toInt()) * 100).toInt()
+        } else {
             Log.d("GameLogicaActivity", "Cursor nulo o vacío")
         }
+
 
     }
 
@@ -123,7 +152,7 @@ class GameLogicaActivity : AppCompatActivity() {
 
         languageSelector.setOnOptionClickListener { language ->
             when (language) {
-                "Español" -> changeLanguage("es")
+                "Portugués" -> changeLanguage("pr")
                 "Inglés" -> changeLanguage("en")
                 "Francés" -> changeLanguage("fr")
                 else -> Toast.makeText(this, "Idioma no reconocido", Toast.LENGTH_SHORT).show()
@@ -161,6 +190,6 @@ class GameLogicaActivity : AppCompatActivity() {
     private fun exitGame() {
         Toast.makeText(this, "Saliendo del juego", Toast.LENGTH_SHORT).show()
         preferences.edit().clear().apply()
-        finish()
+        startActivity(Intent(this, MainActivity::class.java))
     }
 }

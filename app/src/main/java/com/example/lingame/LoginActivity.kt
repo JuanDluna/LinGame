@@ -44,6 +44,10 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var dbsqLite: DBSQLite
 
+    private var isLanguageSelected: Boolean = false
+    private var pendingTasksCount = 0
+    private val lock = Object()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -123,8 +127,11 @@ class LoginActivity : AppCompatActivity() {
     private fun handleUserLogin(user: FirebaseUser?) {
         if (user != null) {
             val userId = user.uid
+            Log.d("LoginActivity", "Usuario a actualizar en la base de datos: ${userId}")
             val email = user.email ?: ""
 
+            // Incrementa el contador por la consulta a firestore
+            incrementPendingTasks("handleUserLogin")
             // Guardar información en base de datos local
             firebaseFirestore.collection("users").document(userId).get()
                 .addOnSuccessListener { document ->
@@ -135,15 +142,9 @@ class LoginActivity : AppCompatActivity() {
                     val englishLevel = data["englishLevel"] as? Map<String, Int> ?: emptyMap()
                     val frenchLevel = data["frenchLevel"] as? Map<String, Int> ?: emptyMap()
                     val portugueseLevel = data["portugueseLevel"] as? Map<String, Int> ?: emptyMap()
-                    val isLanguageSelected = data["isLanguagesSelected"] as? Boolean ?: false
+                    isLanguageSelected = data["isLanguagesSelected"] as? Boolean ?: false
 
                     Log.d("LoginActivity", "Datos obtenidos: $data")
-                    Log.d("LoginActivity", "Nombre: $name, Email: $email, Photo URL: $photoUrl")
-                    Log.d("LoginActivity", "General Level: $generalLevel")
-                    Log.d("LoginActivity", "English Level: $englishLevel")
-                    Log.d("LoginActivity", "French Level: $frenchLevel")
-                    Log.d("LoginActivity", "Portuguese Level: $portugueseLevel")
-                    Log.d("LoginActivity", "isLanguageSelected: $isLanguageSelected")
 
                     saveUserToLocalDatabase(userId, name, email, photoUrl,generalLevel, englishLevel, frenchLevel, portugueseLevel)
 
@@ -154,11 +155,10 @@ class LoginActivity : AppCompatActivity() {
                         apply()
                     }
 
-                    if (isLanguageSelected){
-                        navigateToMain()
-                    }else{
-                        navigateToLanguageSelector()
-                    }
+
+                    decrementPendingTasks()
+                }.addOnFailureListener{
+                    showToast("Error al obtener los datos del usuario. Intente de nuevo")
                 }
         } else {
             showToast("Error al obtener la información del usuario")
@@ -178,10 +178,11 @@ class LoginActivity : AppCompatActivity() {
 
         // Descargar imagen de perfil
         val photoFile = File(filesDir, "$userId.jpg")
-        downloadImage(photoUrl, photoFile)
+        downloadImage(userId, photoFile)
 
         // Guardar en base de datos SQLite
         if(dbsqLite.isUserExists(userId)){
+            Log.d("LoginActivity", "El usuario ya estaba en base de datos, actualizando propiedades.")
             dbsqLite.setUserData(
                 UID = userId,
                 name = name,
@@ -193,6 +194,7 @@ class LoginActivity : AppCompatActivity() {
                 portugueseLevel = portugueseLevel
             )
         }else{
+            Log.d("LoginActivity","Usuario no existente, creando campo de usuario.")
             dbsqLite.newUser(
                 UID = userId,
                 name = name,
@@ -202,48 +204,41 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun downloadImage(urlString: String, destinationFile: File) {
-        if (urlString.isBlank()) {
-            Log.e("LoginActivity", "URL vacía o inválida")
+    private fun downloadImage(userID: String, destinationFile: File) {
+        if (userID.isBlank()) {
+            Log.e("LoginActivity", "El userID está vacío o es inválido")
             return
         }
+        Log.d("LoginActivity" ,"UserID (downloadImage) : ${userID}")
+
+        incrementPendingTasks("DownloadImage")
+
+        val storageReference = firebaseStorage.reference.child("avatars/$userID.jpg")
+
 
         try {
-            val url = URL(urlString)
-            val connection = url.openConnection() as HttpURLConnection
-            connection.doInput = true
-            connection.connect()
-
-            val responseCode = connection.responseCode
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                val inputStream = connection.inputStream
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                saveBitmapToFile(bitmap, destinationFile)
-                Log.d("LoginActivity", "Imagen descargada y guardada")
-                inputStream.close()
-            } else {
-                Log.e("LoginActivity", "Error al descargar la imagen: Código de respuesta $responseCode")
+            // Usa el archivo temporal para guardar la imagen
+            val localFile = destinationFile
+            if(File(destinationFile.absolutePath).exists()){
+                Log.d("LoginActivity", "Archivo actualmente existiendo localmente")
+                decrementPendingTasks()
+                return
             }
-        } catch (e: MalformedURLException) {
-            Log.e("LoginActivity", "URL mal formada: ${e.message}")
-        } catch (e: IOException) {
-            Log.e("LoginActivity", "Error de red: ${e.message}")
+            // Descarga el archivo desde Firebase Storage
+            storageReference.getFile(localFile).addOnSuccessListener {
+                Log.d("LoginActivity", "Imagen descargada exitosamente, ruta: ${localFile.absolutePath}")
+                Log.d("LoginActivity", "Exitencia de fotografia localmente:${File(localFile.absolutePath).exists()} ")
+                decrementPendingTasks()
+            }.addOnFailureListener { exception ->
+                Log.e("LoginActivity", "Error al descargar la imagen: ${exception.message}")
+                decrementPendingTasks()
+            }
         } catch (e: Exception) {
-            Log.e("LoginActivity", "Error desconocido", e)
+            Log.e("LoginActivity", "Error desconocido al configurar la descarga de Firebase", e)
+            decrementPendingTasks()
         }
     }
 
-
-    private fun saveBitmapToFile(bitmap: Bitmap, file: File) {
-        try {
-            val outputStream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-            outputStream.flush()
-            outputStream.close()
-        } catch (e: Exception) {
-            Log.e("LoginActivity", "Error al guardar la imagen: ${e.message}")
-        }
-    }
 
     private fun navigateToMain() {
         startActivity(Intent(this, GameLogicaActivity::class.java))
@@ -253,6 +248,29 @@ class LoginActivity : AppCompatActivity() {
     private fun navigateToLanguageSelector() {
         startActivity(Intent(this, LanguageSelectionActivity::class.java))
         finish()
+    }
+
+    private fun incrementPendingTasks(taskName : String) {
+        synchronized(lock) {
+            Log.i("LoginActivity", "Tarea añadida:${taskName}" )
+            pendingTasksCount++
+        }
+    }
+
+    private fun decrementPendingTasks() {
+        synchronized(lock) {
+            pendingTasksCount--
+            Log.i("LoginActivity", "Tarea pendiente realizada, tareas pendientes: ${pendingTasksCount}")
+            if (pendingTasksCount <= 0) {
+                runOnUiThread {
+                    Log.i("LoginActivity", "Tareas terminadas, ejecutando cambio de pantalla")
+                    if (isLanguageSelected)
+                        navigateToMain()
+                    else
+                        navigateToLanguageSelector()
+                }
+            }
+        }
     }
 
 
