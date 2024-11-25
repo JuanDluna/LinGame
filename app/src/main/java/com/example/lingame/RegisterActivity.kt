@@ -1,20 +1,19 @@
 package com.example.lingame
 
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.RectF
-import android.graphics.BitmapShader
-import android.graphics.Shader
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
+import android.provider.ContactsContract.CommonDataKinds.Website.URL
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,11 +32,21 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.*
 
 class RegisterActivity : AppCompatActivity() {
 
+    // Variables de layout
     private lateinit var bnAvatar: ImageView
     private lateinit var etNombre: EditText
     private lateinit var etCorreo: EditText
@@ -46,25 +55,46 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var btnComencemos: Button
     private lateinit var btnRegresar: ImageButton
     private lateinit var btnFacebook: ImageButton
-    private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var callbackManager: CallbackManager
-    private lateinit var db: DBSQLite
 
-    // Launchers para Activity Result API
+    // API Firebase
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var firebaseFirestore: FirebaseFirestore
+    private lateinit var firebaseStorage: FirebaseStorage
+    private lateinit var storageReference: StorageReference
+
+    // API Facebook
+    private lateinit var callbackManager: CallbackManager
+
+    // Datos locales
+    private lateinit var db: DBSQLite
+    private lateinit var sharedPreferences: SharedPreferences
+
+    // Launcher para seleccionar imagen
+
+    //Launchers
     private lateinit var selectImageFromGalleryLauncher: ActivityResultLauncher<String>
     private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
     private lateinit var requestCameraPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var requestStoragePermissionLauncher: ActivityResultLauncher<String>
     private var cameraImageUri: Uri? = null
+    private var bitmapPhoto: Bitmap? = null
 
-    private lateinit var firebaseStorage: FirebaseStorage
-    private lateinit var storageReference: StorageReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        // Inicializar vistas
+        // Inicialización de vistas y Firebase
+        initializeComponents()
+
+        // Configurar los Launchers para seleccionar o tomar fotos
+        configureActivityResultLaunchers()
+
+        // Configurar eventos
+        configureEventListeners()
+    }
+
+    private fun initializeComponents() {
         etNombre = findViewById(R.id.etNombre)
         etCorreo = findViewById(R.id.etCorreo)
         etContrasena = findViewById(R.id.etContrasena)
@@ -75,142 +105,194 @@ class RegisterActivity : AppCompatActivity() {
         bnAvatar = findViewById(R.id.ivAvatar)
 
         firebaseAuth = FirebaseAuth.getInstance()
-        callbackManager = CallbackManager.Factory.create()
-        db = DBSQLite(this)
-
-        // Inicializar Firebase Storage
+        firebaseFirestore = FirebaseFirestore.getInstance()
         firebaseStorage = FirebaseStorage.getInstance()
         storageReference = firebaseStorage.reference
 
-        // Configurar Launchers
-        configureActivityResultLaunchers()
+        callbackManager = CallbackManager.Factory.create()
 
-        // Eventos
-        bnAvatar.setOnClickListener {
-            showImagePickerDialog()
+        db = DBSQLite(this)
+        sharedPreferences = getSharedPreferences(R.string.sharedPreferencesName.toString(), Context.MODE_PRIVATE)
+
+    }
+
+    private fun configureEventListeners() {
+        bnAvatar.setOnClickListener { showImagePickerDialog() }
+
+        btnComencemos.setOnClickListener { registerUser() }
+
+        btnFacebook.setOnClickListener { loginWithFacebook() }
+
+        btnRegresar.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+    }
+
+
+    private fun registerUser() {
+        val nombre = etNombre.text.toString().trim()
+        val correo = etCorreo.text.toString().trim()
+        val contrasena = etContrasena.text.toString().trim()
+        val confirmarContrasena = etConfirmarContrasena.text.toString().trim()
+
+        if (nombre.isEmpty() || correo.isEmpty() || contrasena.isEmpty() || confirmarContrasena.isEmpty()) {
+            showToast("Todos los campos son obligatorios")
+            return
         }
 
-        btnComencemos.setOnClickListener {
-            val nombre = etNombre.text.toString().trim()
-            val correo = etCorreo.text.toString().trim()
-            val contrasena = etContrasena.text.toString().trim()
-            val confirmarContrasena = etConfirmarContrasena.text.toString().trim()
+        if (contrasena != confirmarContrasena) {
+            showToast("Las contraseñas no coinciden")
+            return
+        }
 
-            if (nombre.isEmpty() || correo.isEmpty() || contrasena.isEmpty() || confirmarContrasena.isEmpty()) {
-                showToast("Todos los campos son obligatorios")
-            } else if (contrasena != confirmarContrasena) {
-                showToast("Las contraseñas no coinciden")
-            } else {
-                firebaseAuth.createUserWithEmailAndPassword(correo, contrasena)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            saveUserToFirestore(nombre, correo, firebaseAuth.currentUser)
-                            uploadImageToFirebaseStorage()
-                        } else {
-                            showToast("Error al registrar: ${task.exception?.message}")
-                        }
+        firebaseAuth.createUserWithEmailAndPassword(correo, contrasena)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val user = firebaseAuth.currentUser
+                    val filePath = saveImageToLocalStorage(bitmapPhoto)
+                    Log.d("RegisterActivity", "File path: $filePath")
+                    saveUserToDatabase(nombre, correo, filePath)
+                    saveUserToFirestore(user)
+                    uploadImageToFirebaseStorage(user)
+                    userIsLogged()
+                } else {
+                    showToast("Error al registrar: ${task.exception?.message}")
+                }
+            }
+    }
+
+    private fun loginWithFacebook() {
+        LoginManager.getInstance().logInWithReadPermissions(
+            this, listOf("email", "public_profile")
+        )
+        LoginManager.getInstance().registerCallback(callbackManager,
+            object : FacebookCallback<LoginResult> {
+                override fun onSuccess(result: LoginResult) {
+                    handleFacebookAccessToken(result.accessToken)
+                }
+
+                override fun onCancel() {
+                    showToast("Inicio cancelado")
+                }
+
+                override fun onError(error: FacebookException) {
+                    showToast("Error: ${error.message}")
+                }
+            })
+    }
+
+    private fun handleFacebookAccessToken(accessToken: AccessToken) {
+        val credential = FacebookAuthProvider.getCredential(accessToken.token)
+        firebaseAuth.signInWithCredential(credential)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val request = GraphRequest.newMeRequest(accessToken) { obj, _ ->
+                        val name = obj?.getString("name") ?: ""
+                        val email = obj?.getString("email") ?: ""
+                        val pictureUrl = obj?.getJSONObject("picture")
+                            ?.getJSONObject("data")?.getString("url") ?: ""
+
+                        saveFacebookUserToLocalDatabase(name, email, pictureUrl)
+
+                        downloadAndSaveProfilePicture(pictureUrl)
+
+                        userIsLogged()
                     }
+                    request.executeAsync()
+                } else {
+                    showToast("Error de autenticación: ${task.exception?.message}")
+                }
+            }
+    }
+
+    private fun downloadAndSaveProfilePicture(pictureUrl: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val url = URL(pictureUrl)
+                val connection = url.openConnection() as HttpURLConnection
+                connection.doInput = true
+                connection.connect()
+                val inputStream = connection.inputStream
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                saveImageToLocalStorage(bitmap)
+            } catch (e: Exception) {
+                Log.e("RegisterActivity", "Error al descargar imagen", e)
+                withContext(Dispatchers.Main) {
+                    showToast("Error al descargar la imagen")
+                }
             }
         }
-
-        btnFacebook.setOnClickListener {
-            LoginManager.getInstance().logInWithReadPermissions(
-                this,
-                listOf("email", "public_profile")
-            )
-            LoginManager.getInstance().registerCallback(callbackManager,
-                object : FacebookCallback<LoginResult> {
-                    override fun onSuccess(result: LoginResult) {
-                        val credential = FacebookAuthProvider.getCredential(result.accessToken.token)
-                        firebaseAuth.signInWithCredential(credential)
-                            .addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    navigateToLanguageSelection()
-                                } else {
-                                    showToast("Error de autenticación: ${task.exception?.message}")
-                                }
-                            }
-                    }
-
-                    override fun onCancel() {
-                        showToast("Inicio cancelado")
-                    }
-
-                    override fun onError(error: FacebookException) {
-                        showToast("Error: ${error.message}")
-                    }
-                }
-            )
-        }
-
-        btnRegresar.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
-    }
-
-    private fun saveUserToFirestore(nombre: String, correo: String, user: FirebaseUser?) {
-        // Referencia a la colección de usuarios en Firestore
-        val db = FirebaseFirestore.getInstance()
-        val userMap = hashMapOf(
-            "name" to nombre,
-            "email" to correo,
-            "avatarUrl" to "" // Inicialmente dejamos el URL vacío, ya que la imagen se subirá después
-        )
-
-        user?.let {
-            // Guardar los datos del usuario con su UID como documento
-            db.collection("users").document(it.uid)
-                .set(userMap)
-                .addOnSuccessListener {
-                    // Si se guarda correctamente en Firestore, navegar a la selección de idiomas
-                    showToast("Registro exitoso")
-                    navigateToLanguageSelection()
-                }
-                .addOnFailureListener { e ->
-                    // Si ocurre un error al guardar los datos en Firestore
-                    showToast("Error al guardar los datos: ${e.message}")
-                }
-        }
     }
 
 
-    private fun uploadImageToFirebaseStorage() {
-        bnAvatar.isDrawingCacheEnabled = true
-        bnAvatar.buildDrawingCache()
+    private fun saveFacebookUserToLocalDatabase(name: String, email: String, pictureUrl: String) {
+        db.newUser(UUID.randomUUID().toString(), name, email, pictureUrl)
+        showToast("Usuario registrado con Facebook")
+        navigateToLanguageSelection()
+    }
+
+
+    private fun resizeImage(uri: Uri): Bitmap? {
+        val inputStream = contentResolver.openInputStream(uri)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        return Bitmap.createScaledBitmap(bitmap, 200, 200, false)
+    }
+
+    private fun getRoundedBitmap(bitmap: Bitmap): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+        val size = Math.min(width, height)
+        val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(output)
+        val paint = Paint().apply { isAntiAlias = true }
+        val rect = RectF(0f, 0f, size.toFloat(), size.toFloat())
+        canvas.drawOval(rect, paint)
+        val shader = BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+        paint.shader = shader
+        canvas.drawOval(rect, paint)
+        return output
+    }
+
+    private fun saveImageToLocalStorage(bitmap: Bitmap?) : String {
+        val file = File(getExternalFilesDir(null), "${firebaseAuth.currentUser?.uid}.jpg")
+        bitmap?.let {
+            val outputStream = FileOutputStream(file)
+            it.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            outputStream.close()
+            showToast("Imagen guardada localmente")
+        }
+        return file.absolutePath;
+    }
+
+    private fun uploadImageToFirebaseStorage(user: FirebaseUser?) {
         val bitmap = (bnAvatar.drawable as BitmapDrawable).bitmap
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         val data = byteArrayOutputStream.toByteArray()
 
-        val imageRef = storageReference.child("avatars/${UUID.randomUUID()}.jpg")
+        val imageRef = storageReference.child("avatars/${user?.uid}.jpg")
         val uploadTask = imageRef.putBytes(data)
 
-        uploadTask.addOnSuccessListener { taskSnapshot ->
+        uploadTask.addOnSuccessListener {
             imageRef.downloadUrl.addOnSuccessListener { uri ->
-                val imageUrl = uri.toString()
-                saveImageUrlToDatabase(imageUrl)
+                saveUserImageUriToDatabase(user, uri.toString())
             }
-        }.addOnFailureListener { exception ->
-            showToast("Error al subir la imagen: ${exception.message}")
+        }.addOnFailureListener {
+            showToast("Error al subir la imagen: ${it.message}")
         }
     }
 
-    private fun saveImageUrlToDatabase(imageUrl: String) {
-        val nombre = etNombre.text.toString().trim()
-        val correo = etCorreo.text.toString().trim()
+    private fun userIsLogged() {
+        sharedPreferences.edit().putBoolean(R.string.isLoggedInPreferences.toString(), true).apply()
+        sharedPreferences.edit().putString(R.string.UID_Preferences.toString(), firebaseAuth.currentUser?.uid).apply()
+    }
 
-        // Guardar URL en Firestore
-        val FireDB = FirebaseFirestore.getInstance()
-        val userMap = hashMapOf("name" to nombre, "email" to correo, "avatarUrl" to imageUrl)
-        firebaseAuth.currentUser?.let { user ->
-            FireDB.collection("users").document(user.uid).set(userMap)
-                .addOnSuccessListener {
-                    showToast("Registro exitoso")
-                    db.newUser(firebaseAuth.currentUser!!.uid, nombre, correo, imageUrl)
-                    navigateToLanguageSelection()
-                }
-                .addOnFailureListener { e ->
-                    showToast("Error al guardar datos: ${e.message}")
+    private fun saveUserImageUriToDatabase(user: FirebaseUser?, imageUrl: String) {
+        val dbRef = FirebaseFirestore.getInstance()
+        val userMap = hashMapOf("avatarUrl" to imageUrl)
+
+        user?.let {
+            dbRef.collection("users").document(it.uid).update(userMap as Map<String, Any>)
+                .addOnFailureListener {
+                    showToast("Error al guardar URL de imagen: ${it.message}")
                 }
         }
     }
@@ -220,8 +302,68 @@ class RegisterActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    private fun saveUserToFirestore(user: FirebaseUser?){
+        val name = etNombre.text.toString().trim()
+        val email = etCorreo.text.toString().trim()
+        val userMap = hashMapOf(
+            "name" to name,
+            "email" to email,
+            "isLanguagesSelected" to false
+        )
+        firebaseFirestore.collection("users").document(user!!.uid).set(userMap)
+    }
+
+    private fun saveUserToDatabase(name: String, email: String, photo_path: String) {
+        db.newUser(firebaseAuth.currentUser?.uid ?: email, name, email, photo_path)
+        navigateToLanguageSelection()
+    }
+
+    private fun configureActivityResultLaunchers() {
+        selectImageFromGalleryLauncher =
+            registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+                uri?.let {
+                    val resizedBitmap = resizeImage(it)
+                    bitmapPhoto = resizedBitmap?.let { getRoundedBitmap(it) }
+                    bnAvatar.setImageBitmap(bitmapPhoto)
+                }
+            }
+
+        takePictureLauncher =
+            registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+                if (success) {
+                    cameraImageUri?.let {
+                        val resizedBitmap = resizeImage(it)
+                        bitmapPhoto = resizedBitmap?.let { getRoundedBitmap(it) }
+                        bnAvatar.setImageBitmap(bitmapPhoto)
+                    }
+                }
+            }
+
+        requestCameraPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                if (isGranted) {
+                    val values = ContentValues().apply {
+                        put(MediaStore.Images.Media.TITLE, "Nueva Imagen")
+                        put(MediaStore.Images.Media.DESCRIPTION, "Tomada desde la cámara")
+                    }
+                    cameraImageUri = contentResolver.insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        values
+                    )
+                    takePictureLauncher.launch(cameraImageUri!!)
+                } else {
+                    showToast("Permiso de cámara denegado")
+                }
+            }
+
+        requestStoragePermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                if (isGranted) {
+                    selectImageFromGalleryLauncher.launch("image/*")
+                } else {
+                    showToast("Permiso de almacenamiento denegado")
+                }
+            }
     }
 
     private fun showImagePickerDialog() {
@@ -259,72 +401,7 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    private fun configureActivityResultLaunchers() {
-        selectImageFromGalleryLauncher =
-            registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-                uri?.let {
-                    val resizedBitmap = resizeImage(it)
-                    val roundedBitmap = resizedBitmap?.let { getRoundedBitmap(it) }
-                    bnAvatar.setImageBitmap(roundedBitmap)
-                }
-            }
-
-        takePictureLauncher =
-            registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-                if (success) {
-                    cameraImageUri?.let {
-                        val resizedBitmap = resizeImage(it)
-                        val roundedBitmap = resizedBitmap?.let { getRoundedBitmap(it) }
-                        bnAvatar.setImageBitmap(roundedBitmap)
-                    }
-                }
-            }
-
-        requestCameraPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) {
-                    val values = ContentValues().apply {
-                        put(MediaStore.Images.Media.TITLE, "Nueva Imagen")
-                        put(MediaStore.Images.Media.DESCRIPTION, "Tomada desde la cámara")
-                    }
-                    cameraImageUri = contentResolver.insert(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        values
-                    )
-                    takePictureLauncher.launch(cameraImageUri!!)
-                } else {
-                    showToast("Permiso de cámara denegado")
-                }
-            }
-
-        requestStoragePermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) {
-                    selectImageFromGalleryLauncher.launch("image/*")
-                } else {
-                    showToast("Permiso de almacenamiento denegado")
-                }
-            }
-    }
-
-    private fun resizeImage(uri: Uri): Bitmap? {
-        val inputStream = contentResolver.openInputStream(uri)
-        val bitmap = BitmapFactory.decodeStream(inputStream)
-        val width = 500
-        val height = (bitmap.height * (width / bitmap.width.toFloat())).toInt()
-        return Bitmap.createScaledBitmap(bitmap, width, height, false)
-    }
-
-    private fun getRoundedBitmap(bitmap: Bitmap): Bitmap {
-        val size = Math.min(bitmap.width, bitmap.height)
-        val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(output)
-        val paint = Paint()
-        val shader = BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
-        paint.shader = shader
-        paint.isAntiAlias = true
-        val rect = RectF(0f, 0f, size.toFloat(), size.toFloat())
-        canvas.drawRoundRect(rect, size / 2f, size / 2f, paint)
-        return output
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

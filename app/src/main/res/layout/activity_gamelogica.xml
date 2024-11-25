@@ -67,7 +67,7 @@
                 android:spinnerMode="dropdown"
                 android:layout_marginTop="48dp"
                 android:src="@drawable/banderamexico"
-                android:background="@color/generalWhite"
+                android:background="@drawable/dropdown_background"
                 app:shapeAppearanceOverlay="@style/RoundedCornerImage"
                 android:tooltipText="Selecciona un idioma"
                 android:contentDescription="Language Selector"/>
@@ -88,6 +88,7 @@
             android:layout_height="64dp"
             android:src="@android:drawable/menu_frame"
             android:contentDescription="Menu Button"
-            android:background="@color/generalWhite"/>
+            android:background="@drawable/dropdown_background" />
+
     </LinearLayout>
 </FrameLayout>

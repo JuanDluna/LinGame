@@ -2,103 +2,237 @@ package com.example.lingame
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.google.firebase.firestore.FirebaseFirestore
-
 class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     // Uso de base de datos local en caso de que no se pueda acceder a Firebase
-    var FirebaseFS = FirebaseFirestore.getInstance();
-    companion object{
-        private const val DATABASE_VERSION = 1
+    var FirebaseFS = FirebaseFirestore.getInstance()
+
+    companion object {
+        private const val DATABASE_VERSION = 3  // Incrementamos la versión de la base de datos
         private const val DATABASE_NAME = "lingame"
-        private const val TABLE_NAME = "users"
+        private const val TABLE_USERS = "users"
+        private const val TABLE_ENGLISH = "english_levels"
+        private const val TABLE_FRENCH = "french_levels"
+        private const val TABLE_PORTUGUESE = "portuguese_levels"
+
+        // Columnas de la tabla 'users'
         private const val COLUMN_ID = "id"
         private const val COLUMN_NAME = "name"
         private const val COLUMN_EMAIL = "email"
         private const val COLUMN_PHOTO_URL = "photo_url"
-        private const val COLUMN_LEVEL_EN = "level_En"
-        private const val COLUMN_LEVEL_PR = "level_Pr"
-        private const val COLUMN_LEVEL_FR = "level_Fr"
-    }
+        private const val COLUMN_GENERAL_LEVEL = "generalLevel"  // Nueva columna
 
+        // Columnas de las tablas de niveles de idiomas
+        private const val COLUMN_LEVEL_CREA_HISTORIA = "levelCreaHistoria"
+        private const val COLUMN_LEVEL_RR = "levelRR"
+        private const val COLUMN_LEVEL_TRADUCELO = "levelTraducelo"
+        private const val COLUMN_LEVEL_PARAFRASEA = "levelParafrasea"
+    }
 
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL("CREATE TABLE $TABLE_NAME " +
-                "(${COLUMN_ID} TEXT PRIMARY KEY ," +
-                "${COLUMN_NAME} TEXT," +
-                "${COLUMN_EMAIL} TEXT," +
-                "${COLUMN_PHOTO_URL} TEXT," +
-                "${COLUMN_LEVEL_EN} INTEGER," +
-                "${COLUMN_LEVEL_FR} INTEGER," +
-                "${COLUMN_LEVEL_PR} INTEGER)");
+        // Crear tabla de usuarios (incluyendo la columna generalLevel)
+        db.execSQL(
+            "CREATE TABLE $TABLE_USERS (" +
+                    "$COLUMN_ID TEXT PRIMARY KEY," +
+                    "$COLUMN_NAME TEXT," +
+                    "$COLUMN_EMAIL TEXT," +
+                    "$COLUMN_PHOTO_URL TEXT," +
+                    "$COLUMN_GENERAL_LEVEL REAL DEFAULT 0.0)"  // Agregamos la columna generalLevel
+        )
 
+        // Las tablas de idiomas se crean solo si el usuario tiene una relación con el idioma
+        // Crear tabla de inglés (si no existe)
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS $TABLE_ENGLISH (" +
+                    "$COLUMN_ID TEXT PRIMARY KEY," +
+                    "$COLUMN_LEVEL_CREA_HISTORIA INTEGER DEFAULT 0," +
+                    "$COLUMN_LEVEL_RR INTEGER DEFAULT 0," +
+                    "$COLUMN_LEVEL_TRADUCELO INTEGER DEFAULT 0," +
+                    "$COLUMN_LEVEL_PARAFRASEA INTEGER DEFAULT 0," +
+                    "FOREIGN KEY($COLUMN_ID) REFERENCES $TABLE_USERS($COLUMN_ID))"
+        )
+
+        // Crear tabla de francés (si no existe)
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS $TABLE_FRENCH (" +
+                    "$COLUMN_ID TEXT PRIMARY KEY," +
+                    "$COLUMN_LEVEL_CREA_HISTORIA INTEGER DEFAULT 0," +
+                    "$COLUMN_LEVEL_RR INTEGER DEFAULT 0," +
+                    "$COLUMN_LEVEL_TRADUCELO INTEGER DEFAULT 0," +
+                    "$COLUMN_LEVEL_PARAFRASEA INTEGER DEFAULT 0," +
+                    "FOREIGN KEY($COLUMN_ID) REFERENCES $TABLE_USERS($COLUMN_ID))"
+        )
+
+        // Crear tabla de portugués (si no existe)
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS $TABLE_PORTUGUESE (" +
+                    "$COLUMN_ID TEXT PRIMARY KEY," +
+                    "$COLUMN_LEVEL_CREA_HISTORIA INTEGER DEFAULT 0," +
+                    "$COLUMN_LEVEL_RR INTEGER DEFAULT 0," +
+                    "$COLUMN_LEVEL_TRADUCELO INTEGER DEFAULT 0," +
+                    "$COLUMN_LEVEL_PARAFRASEA INTEGER DEFAULT 0," +
+                    "FOREIGN KEY($COLUMN_ID) REFERENCES $TABLE_USERS($COLUMN_ID))"
+        )
     }
 
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        TODO("Not yet implemented")
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        if (oldVersion < 3) {
+            // Si la versión es 2 o menor, agregamos la columna generalLevel a la tabla de usuarios
+            db.execSQL("ALTER TABLE $TABLE_USERS ADD COLUMN $COLUMN_GENERAL_LEVEL REAL DEFAULT 0.0")
+        }
     }
 
-    fun newUser(UID : String, name: String, email: String, photo_url: String? = null,) : Boolean{
+    // Método para crear un nuevo usuario, incluyendo el campo generalLevel
+    fun newUser(UID: String, name: String, email: String, photo_url: String? = null): Boolean {
+        val db = this.writableDatabase
+
+        val userValues = ContentValues().apply {
+            put(COLUMN_ID, UID)
+            put(COLUMN_NAME, name)
+            put(COLUMN_EMAIL, email)
+            put(COLUMN_PHOTO_URL, photo_url)
+            put(COLUMN_GENERAL_LEVEL, 0.0)  // Valor inicial de generalLevel
+        }
+
+        // Insertar usuario
+        val userResult = db.insert(TABLE_USERS, null, userValues)
+
+        db.close()
+        return userResult != -1L
+    }
+
+    // Método para actualizar el nivel general del usuario
+    fun updateGeneralLevel(UID: String, newGeneralLevel: Float) {
         val db = this.writableDatabase
         val values = ContentValues().apply {
-            put("id", UID)
-            put("name", name)
-            put("email", email)
-            put("photo_url", photo_url)
+            put(COLUMN_GENERAL_LEVEL, newGeneralLevel)
         }
-        val result = db.insert(TABLE_NAME, null, values)
-        db.close()
-        return result != -1L
+        db.update(TABLE_USERS, values, "$COLUMN_ID = ?", arrayOf(UID))
     }
 
-    fun setUsers(UID: String, name: String, email: String, level_En: Int?, level_Pr: Int?, level_Fr: Int?){
-        val db = this.writableDatabase
-        val sql = "UPDATE $TABLE_NAME SET name = '$name', email = '$email', level_En = $level_En, level_Pr = $level_Pr, level_Fr = $level_Fr WHERE id = '$UID' "
-        db.execSQL(sql)
-    }
-
-    fun increaseEnglishLevel(UID: String){
-        val db = this.writableDatabase
-        val sql = "UPDATE $TABLE_NAME SET level_En = level_En + 1 WHERE id = '$UID'"
-        db.execSQL(sql)
-    }
-
-    fun increaseFrenchLevel(UID: String){
-        val db = this.writableDatabase
-        val sql = "UPDATE $TABLE_NAME SET level_Fr = level_Fr + 1 WHERE id = '$UID'"
-        db.execSQL(sql)
-    }
-
-    fun increasePortugueseLevel(UID: String){
-        val db = this.writableDatabase
-        val sql = "UPDATE $TABLE_NAME SET level_Pr = level_Pr + 1 WHERE id = '$UID'"
-        db.execSQL(sql)
-    }
-
-
-    fun getUserLevels(UID: String): List<Int>{
+    // Método para obtener el nivel general del usuario
+    fun getGeneralLevel(UID: String): Float {
         val db = this.readableDatabase
-        val sql = "SELECT level_En, level_Pr, level_Fr FROM $TABLE_NAME WHERE id = '$UID'"
-        val cursor = db.rawQuery(sql, null)
+        val cursor = db.query(
+            TABLE_USERS,
+            arrayOf(COLUMN_GENERAL_LEVEL),
+            "$COLUMN_ID = ?",
+            arrayOf(UID),
+            null,
+            null,
+            null
+        )
 
-        val levels = mutableListOf<Int>()
-
+        var generalLevel = 0.0f
         if (cursor.moveToFirst()) {
-            val levelEn = cursor.getInt(
-                cursor.getColumnIndexOrThrow("level_En"))
-            val levelPr = cursor.getInt(
-                cursor.getColumnIndexOrThrow("level_Pr"))
-            val levelFr = cursor.getInt(
-                cursor.getColumnIndexOrThrow("level_Fr"))
-
-            levels.add(levelEn)
-            levels.add(levelPr)
-            levels.add(levelFr)
+            generalLevel = cursor.getFloat(cursor.getColumnIndexOrThrow(COLUMN_GENERAL_LEVEL))
         }
 
         cursor.close()
-        return levels
+        return generalLevel
+    }
+
+    // Método para actualizar todos los datos de un usuario, incluyendo generalLevel
+    fun setUserData(
+        UID: String,
+        name: String,
+        email: String,
+        photoUrl: String? = null,
+        generalLevel: Float,
+        englishLevel: Map<String, Int>,
+        frenchLevel: Map<String, Int>,
+        portugueseLevel: Map<String, Int>) {
+        val db = this.writableDatabase
+        val userValues = ContentValues().apply {
+            put(COLUMN_NAME, name)
+            put(COLUMN_EMAIL, email)
+            put(COLUMN_PHOTO_URL, photoUrl)
+            put(COLUMN_GENERAL_LEVEL, generalLevel)
+        }
+        val userResult = db.update(
+            TABLE_USERS, userValues, "$COLUMN_ID = ?", arrayOf(UID)
+        )
+        if (userResult > 0) {
+            val englishValues = ContentValues().apply {
+                put(COLUMN_ID, UID)
+                put(COLUMN_LEVEL_CREA_HISTORIA, englishLevel[COLUMN_LEVEL_CREA_HISTORIA])
+                put(COLUMN_LEVEL_RR, englishLevel[COLUMN_LEVEL_RR])
+                put(COLUMN_LEVEL_TRADUCELO, englishLevel[COLUMN_LEVEL_TRADUCELO])
+                put(COLUMN_LEVEL_PARAFRASEA, englishLevel[COLUMN_LEVEL_PARAFRASEA])
+            }
+            val frenchValues = ContentValues().apply {
+                put(COLUMN_ID, UID)
+                put(COLUMN_LEVEL_CREA_HISTORIA, frenchLevel[COLUMN_LEVEL_CREA_HISTORIA])
+                put(COLUMN_LEVEL_RR, frenchLevel[COLUMN_LEVEL_RR])
+                put(COLUMN_LEVEL_TRADUCELO, frenchLevel[COLUMN_LEVEL_TRADUCELO])
+                put(COLUMN_LEVEL_PARAFRASEA, frenchLevel[COLUMN_LEVEL_PARAFRASEA])
+            }
+            val portugueseValues = ContentValues().apply {
+                put(COLUMN_ID, UID)
+                put(COLUMN_LEVEL_CREA_HISTORIA, portugueseLevel[COLUMN_LEVEL_CREA_HISTORIA])
+                put(COLUMN_LEVEL_RR, portugueseLevel[COLUMN_LEVEL_RR])
+                put(COLUMN_LEVEL_TRADUCELO, portugueseLevel[COLUMN_LEVEL_TRADUCELO])
+                put(COLUMN_LEVEL_PARAFRASEA, portugueseLevel[COLUMN_LEVEL_PARAFRASEA])
+            }
+            try {
+                db.insert(TABLE_ENGLISH, null, englishValues)
+                db.insert(TABLE_FRENCH, null, frenchValues)
+                db.insert(TABLE_PORTUGUESE, null, portugueseValues)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun getUserData(UID: String): Cursor? {
+        val db = this.readableDatabase
+        return db.rawQuery("SELECT * FROM $TABLE_USERS WHERE $COLUMN_ID = ?", arrayOf(UID))
+    }
+
+    // Método para verificar si un usuario existe
+    fun isUserExists(UID: String): Boolean {
+        val db = this.readableDatabase
+        val cursor = db.query(
+            TABLE_USERS,
+            arrayOf(COLUMN_ID),
+            "$COLUMN_ID = ?",
+            arrayOf(UID),
+            null,
+            null,
+            null
+        )
+        val exists = cursor.count > 0
+        cursor.close()
+        return exists
+    }
+
+    fun createFrenchTable(UID: String) {
+        val db = this.writableDatabase
+        val frenchValues = ContentValues().apply {
+            put(COLUMN_ID, UID)
+        }
+        db.insert(TABLE_FRENCH, null, frenchValues)
+        db.close()
+    }
+
+    fun createEnglishTable(UID: String) {
+        val db = this.writableDatabase
+        val englishValues = ContentValues().apply {
+            put(COLUMN_ID, UID)
+        }
+        db.insert(TABLE_ENGLISH, null, englishValues)
+        db.close()
+    }
+
+    fun createPortugueseTable(UID: String) {
+        val db = this.writableDatabase
+        val portugueseValues = ContentValues().apply {
+            put(COLUMN_ID, UID)
+        }
+        db.insert(TABLE_PORTUGUESE, null, portugueseValues)
     }
 
 }

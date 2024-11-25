@@ -1,27 +1,58 @@
 package com.example.lingame
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.firestore.FirebaseFirestore
+import org.checkerframework.checker.guieffect.qual.UI
 
 class MainActivity : AppCompatActivity() {
+
+    var fireStore = FirebaseFirestore.getInstance()
+    var UID : String? = null
+    var isLoggedIn : Boolean? = null
+    var lastLanguage : String? = null
+    var isLanguagesSelected : Boolean? = null
+    var sharedPreferences : SharedPreferences? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         // Verificar si el usuario ya está logueado
-        val sharedPreferences = getSharedPreferences("LingamePreferences", MODE_PRIVATE)
-        val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
+        sharedPreferences = getSharedPreferences(R.string.sharedPreferencesName.toString(), MODE_PRIVATE)
 
-        if (isLoggedIn) {
-            // Redirigir directamente a la actividad del juego si ya está logueado
-            val intent = Intent(this, GameLogicaActivity::class.java)
-            startActivity(intent)
-            finish() // Finalizar esta actividad para evitar volver con el botón "atrás"
-            return
+        // TODO: Borrar cuando se acabe el momento de pruebas
+//        sharedPreferences.edit().clear().apply()
+
+        UID  = sharedPreferences!!.getString(R.string.UID_Preferences.toString(), null)
+        isLoggedIn = sharedPreferences!!.getBoolean(R.string.isLoggedInPreferences.toString(), false)
+        lastLanguage = sharedPreferences!!.getString(R.string.lastLanguagePreferences.toString(), null)
+
+
+
+        Log.d("MainActivity", "Shared Preferences : ${sharedPreferences!!.all}")
+
+        try {
+            fireStore.collection("users").document(UID.toString()).get().
+            addOnSuccessListener { document ->
+                var data = document.data
+                if (data != null) {
+                    isLanguagesSelected = data["isLanguagesSelected"] as? Boolean ?: false
+                    checkWhereToNavigate()
+                }
+            }.addOnFailureListener{
+                Log.d("MainActivity", "Error al obtener datos del usuario: ${it.message}")
+                checkWhereToNavigate()
+            }
+        }catch (e: Exception){
+                Log.d("MainActivity", "Error al obtener datos del usuario: ${e.message}")
         }
+
 
         // Si no está logueado, mostrar la pantalla inicial
         setContentView(R.layout.initial_screen)
@@ -41,6 +72,24 @@ class MainActivity : AppCompatActivity() {
             // Navegar a la pantalla de inicio de sesión
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
+        }
+    }
+
+    private fun checkWhereToNavigate(){
+        if (isLoggedIn!!) {
+            Log.d("MainActivity", "Is Loggued and checking info")
+            if(isLanguagesSelected!! == true){
+//                 Redirigir directamente a la actividad del juego si ya está logueado
+                val intent = Intent(this, GameLogicaActivity::class.java)
+                startActivity(intent)
+                finish() // Finalizar esta actividad para evitar volver con el botón "atrás"
+                return
+            }else{
+                val intent = Intent(this, LanguageSelectionActivity::class.java)
+                startActivity(intent)
+                finish() // Finalizar esta actividad para evitar volver con el botón "atrás"
+                return
+            }
         }
     }
 }
