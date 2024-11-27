@@ -8,20 +8,27 @@ import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
-import org.checkerframework.checker.guieffect.qual.UI
 
 class MainActivity : AppCompatActivity() {
 
     var fireStore = FirebaseFirestore.getInstance()
     var UID : String? = null
     var isLoggedIn : Boolean? = null
-    var lastLanguage : String? = null
+    var selectedLanguage : String? = null
     var isLanguagesSelected : Boolean? = null
     var sharedPreferences : SharedPreferences? = null
+
+    // Variable para usar en pruebas
+    private var debbugerMode = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        if (debbugerMode){
+            startActivity(Intent(this, RetoRapidoActivity::class.java))
+            return
+        }
 
         // Verificar si el usuario ya está logueado
         sharedPreferences = getSharedPreferences(R.string.sharedPreferencesName.toString(), MODE_PRIVATE)
@@ -31,7 +38,7 @@ class MainActivity : AppCompatActivity() {
 
         UID  = sharedPreferences!!.getString(R.string.UID_Preferences.toString(), null)
         isLoggedIn = sharedPreferences!!.getBoolean(R.string.isLoggedInPreferences.toString(), false)
-        lastLanguage = sharedPreferences!!.getString(R.string.lastLanguagePreferences.toString(), null)
+        selectedLanguage = sharedPreferences!!.getString(R.string.selectedLanguagePreferences.toString(), null)
 
 
 

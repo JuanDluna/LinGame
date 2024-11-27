@@ -52,6 +52,7 @@
         <activity android:name=".LanguageSelectionActivity"     />
         <activity android:name=".TutorialActivity"     />
         <activity android:name=".GameLogicaActivity"     />
+        <activity android:name=".RetoRapidoActivity"/>
 
 
     </application>

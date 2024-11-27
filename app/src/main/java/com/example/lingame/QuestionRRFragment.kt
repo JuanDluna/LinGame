@@ -11,16 +11,20 @@ import android.widget.Button
 import android.widget.TextView
 
 class QuestionRRFragment : Fragment() {
-    // Clase "Question" para el manejo de preguntas y respuestas haciendo traspaso entre elementos.
-    data class Question(val question: String = "", val answers: Map<String, Boolean> = mapOf() ) : Parcelable {
+
+    data class Question(
+        val answers: List<String> = emptyList(),  // Lista de respuestas posibles
+        val question: Map<String, String> = emptyMap()  // Mapa con las traducciones de la pregunta
+    ) : Parcelable {
+
         constructor(parcel: Parcel) : this(
-            parcel.readString() ?: "",
-            parcel.readHashMap(String::class.java.classLoader) as Map<String, Boolean>
+            parcel.createStringArrayList() ?: emptyList(),
+            parcel.readHashMap(String::class.java.classLoader) as Map<String, String>
         )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
-            parcel.writeString(question)
-            parcel.writeMap(answers)
+            parcel.writeStringList(answers)
+            parcel.writeMap(question)
         }
 
         override fun describeContents(): Int = 0
@@ -35,6 +39,7 @@ class QuestionRRFragment : Fragment() {
             }
         }
     }
+
 
     companion object {
         private const val ARG_QUESTION = "question"
@@ -63,21 +68,5 @@ class QuestionRRFragment : Fragment() {
         // Obtener la pregunta desde los argumentos
         question = arguments?.getParcelable(ARG_QUESTION) ?: return
 
-        val questionText = view.findViewById<TextView>(R.id.question_text)
-        val answersContainer = view.findViewById<ViewGroup>(R.id.answers_container)
-
-        questionText.text = question.text
-
-        // Mostrar las respuestas
-        question.answers.forEach { answer ->
-            val button = Button(context).apply {
-                text = answer.text
-                setOnClickListener {
-                    val isCorrect = answer.isCorrect
-                    (activity as? RetoRapidoActivity)?.onQuestionAnswered(isCorrect)
-                }
-            }
-            answersContainer.addView(button)
-        }
     }
 }
