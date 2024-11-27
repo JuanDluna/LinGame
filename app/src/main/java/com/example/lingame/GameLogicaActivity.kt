@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.SurfaceView
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -31,6 +32,7 @@ class GameLogicaActivity : AppCompatActivity() {
     private lateinit var experienceBar: ProgressBar
     private lateinit var menuButton: ButtonDropdownMenu
     private lateinit var languageSelector: ButtonDropdownMenu
+    private lateinit var surfaceView: SurfaceView
 
     private lateinit var dbHelper: DBSQLite
     private lateinit var preferences: SharedPreferences
@@ -63,8 +65,9 @@ class GameLogicaActivity : AppCompatActivity() {
         experienceBar = findViewById(R.id.experienceBar)
         menuButton = findViewById(R.id.menuButton)
         languageSelector = findViewById(R.id.languageSelector)
+        surfaceView = findViewById<SurfaceView>(R.id.gameSurfaceView)
 
-        val UID = preferences.getString(R.string.UID_Preferences.toString(), "")!!
+        val UID = preferences.getString(R.string.UID_Preferences.toString(), null)
         Log.d("GameLogicaActivity", "Usuario logueado: ${UID}")
 
         var cursorDb: android.database.Cursor? = null
@@ -116,6 +119,11 @@ class GameLogicaActivity : AppCompatActivity() {
         }
 
 
+        surfaceView.setOnClickListener{
+            showToast("Click en SurfaceView")
+        }
+
+
     }
 
     /**
@@ -158,6 +166,10 @@ class GameLogicaActivity : AppCompatActivity() {
                 else -> Toast.makeText(this, "Idioma no reconocido", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun showToast(message: String){
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     /**
