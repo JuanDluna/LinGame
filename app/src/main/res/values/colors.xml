@@ -16,4 +16,9 @@
     <color name="textPrimaryBlack">#E0E0E0</color>
     <color name="textSecundaryBlack">#B0BEC5</color>
     <color name="warningBlack">#EF5350</color>
+
+    <!-- Colores generales      -->
+    <color name="green">#4CAF50</color>
+    <color name="red">#F44336</color>
+
 </resources>

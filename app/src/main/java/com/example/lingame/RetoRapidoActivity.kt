@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import com.example.lingame.QuestionRRFragment.Question
+import com.example.lingame.QuestionRRFragment.Answer
 
 class RetoRapidoActivity : FragmentActivity() {
 
@@ -21,16 +22,16 @@ class RetoRapidoActivity : FragmentActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var database: DatabaseReference
     private var questionsList = mutableListOf<Question>()
-    // Lista de preguntas
-    private var currentQuestionIndex = 0  // Para llevar el control de la pregunta actual
+    private var currentQuestionIndex = 0 // Control del índice de la pregunta actual
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reto_rapido)
 
-        // Inicializador shared preferences
+        // Inicializar SharedPreferences
+        sharedPreferences = getSharedPreferences("LingamePrefs", MODE_PRIVATE)
 
-        // Inicializar Firebase Realtime Database
+        // Inicializar Firebase Database
         database = FirebaseDatabase.getInstance().reference.child("languages").child("reto_rapido")
 
         // Inicializar la UI
@@ -42,34 +43,37 @@ class RetoRapidoActivity : FragmentActivity() {
         // Cargar preguntas al iniciar
         loadQuestions()
 
-        // Cargar el primer fragmento con la primera pregunta
+        // Mostrar la primera pregunta si no hay estado guardado
         if (savedInstanceState == null) {
             showNextQuestion()
         }
     }
 
     private fun loadQuestions() {
-        // Obtener todas las preguntas de Firebase
         database.get().addOnSuccessListener { dataSnapshot ->
             val allQuestions = mutableListOf<Question>()
 
-            // Recorrer los datos obtenidos
+            Log.i("RetoRapidoActivity", "Cantidad de preguntas cargadas: ${dataSnapshot.childrenCount}")
             dataSnapshot.children.forEach { questionSnapshot ->
-                val question = questionSnapshot.getValue(Question::class.java)
-                if (question != null) {
+                val questionMap = questionSnapshot.child("question").value as? Map<String, String>
+                val answersMap = questionSnapshot.child("answers").value as? Map<String, List<Boolean>>
+
+                if (questionMap != null && answersMap != null) {
+                    val question = Question(
+                        question = questionMap,
+                        answers = answersMap.map { (key, value) ->
+                            Answer(key, value.firstOrNull() ?: false)
+                        }
+                    )
                     allQuestions.add(question)
                 }
             }
 
             if (allQuestions.isNotEmpty()) {
-                // Mezclar preguntas aleatoriamente
                 allQuestions.shuffle()
-
-                // Tomar las primeras 10 preguntas después de mezclar
+                Log.i("RetoRapidoActivity", "Cantidad de preguntas mezcladas: ${allQuestions.size}")
                 questionsList.clear()
                 questionsList.addAll(allQuestions.take(10))
-
-                Log.i("RetoRapidoActivity", "Preguntas obtenidas: $questionsList")
                 showNextQuestion()
             } else {
                 Toast.makeText(this, "No se encontraron preguntas", Toast.LENGTH_SHORT).show()
@@ -79,20 +83,16 @@ class RetoRapidoActivity : FragmentActivity() {
         }
     }
 
-    private fun showNextQuestion() {
+    fun showNextQuestion() {
         if (currentQuestionIndex < questionsList.size) {
             val currentQuestion = questionsList[currentQuestionIndex]
-            // Aquí puedes mostrar la pregunta en la UI, usando los valores del mapa según el idioma
-            // Ejemplo de cómo obtener la pregunta en español:
-            val questionText = currentQuestion.question[]
-            Log.i("RetoRapidoActivity", "Pregunta actual: $questionText")
+            val fragment = QuestionRRFragment.newInstance(currentQuestion)
 
-            // También mostrar las respuestas
-            currentQuestion.answers.forEach {
-                Log.i("RetoRapidoActivity", "Opción: $it")
-            }
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.questionFragmentContainer, fragment)
+                .commit()
 
-            currentQuestionIndex++  // Incrementar el índice para la siguiente pregunta
+            currentQuestionIndex++
         } else {
             Toast.makeText(this, "¡Fin del juego!", Toast.LENGTH_SHORT).show()
         }
@@ -100,7 +100,6 @@ class RetoRapidoActivity : FragmentActivity() {
 
     private fun startTimer() {
         var seconds = 0
-
         lifecycleScope.launch(Dispatchers.Main) {
             while (seconds < 60) {
                 delay(1000)
@@ -113,6 +112,10 @@ class RetoRapidoActivity : FragmentActivity() {
     }
 
     fun onQuestionAnswered(isCorrect: Boolean) {
-        // Aquí puedes agregar lógica para actualizar el puntaje basado en si la respuesta es correcta
+        if (isCorrect) {
+        // Aumentar el puntaje si es correcto
+            scoreBar.incrementScore(500)
+        }
+        showNextQuestion()
     }
 }

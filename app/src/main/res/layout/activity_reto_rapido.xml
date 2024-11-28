@@ -23,7 +23,6 @@
         android:layout_width="match_parent"
         android:layout_height="32dp"
         android:layout_margin="16dp"
-        android:progressDrawable="@drawable/progress_horizontal"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -33,11 +32,15 @@
         android:id="@+id/timerRR"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:layout_marginStart="24dp"
+        android:padding="6dp"
         android:text="00:00"
         android:textSize="24sp"
         android:textColor="@android:color/black"
         style="@style/RoundedEditText"
+        android:backgroundTint="@color/generalWhite"
+        android:fontFamily="@font/howdy_lemon"
         app:layout_constraintTop_toBottomOf="@id/scoreBarRR"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/questionFragmentContainer"/>
