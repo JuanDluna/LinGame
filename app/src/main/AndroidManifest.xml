@@ -53,6 +53,7 @@
         <activity android:name=".TutorialActivity"     />
         <activity android:name=".GameLogicaActivity"     />
         <activity android:name=".RetoRapidoActivity"/>
+        <activity android:name=".ParafraseaActivity"     />
 
 
     </application>

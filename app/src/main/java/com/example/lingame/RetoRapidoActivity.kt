@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import com.example.lingame.QuestionRRFragment.Question
 import com.example.lingame.QuestionRRFragment.Answer
+import com.google.firebase.database.DatabaseReference
 
 class RetoRapidoActivity : FragmentActivity() {
 
@@ -29,7 +30,7 @@ class RetoRapidoActivity : FragmentActivity() {
         setContentView(R.layout.activity_reto_rapido)
 
         // Inicializar SharedPreferences
-        sharedPreferences = getSharedPreferences("LingamePrefs", MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(R.string.sharedPreferencesName.toString(), MODE_PRIVATE)
 
         // Inicializar Firebase Database
         database = FirebaseDatabase.getInstance().reference.child("languages").child("reto_rapido")
@@ -74,6 +75,9 @@ class RetoRapidoActivity : FragmentActivity() {
                 Log.i("RetoRapidoActivity", "Cantidad de preguntas mezcladas: ${allQuestions.size}")
                 questionsList.clear()
                 questionsList.addAll(allQuestions.take(10))
+                questionsList.forEach{question ->
+                    question.answers.shuffled()
+                }
                 showNextQuestion()
             } else {
                 Toast.makeText(this, "No se encontraron preguntas", Toast.LENGTH_SHORT).show()

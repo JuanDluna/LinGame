@@ -12,6 +12,9 @@ class TutorialActivity : AppCompatActivity() {
         setContentView(R.layout.activity_tutorial)
 
         val platformControl1 = findViewById<PlatformControl>(R.id.platformControl)
+        //TODO Implementar actividad de tutorial
+
+
         platformControl1.targetActivity = LoginActivity::class.java
     }
 }

@@ -19,14 +19,14 @@ class MainActivity : AppCompatActivity() {
     var sharedPreferences : SharedPreferences? = null
 
     // Variable para usar en pruebas
-    private var debbugerMode = true
+    private var debbugerMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         if (debbugerMode){
-            startActivity(Intent(this, RetoRapidoActivity::class.java))
+            startActivity(Intent(this, GameActivity::class.java))
             return
         }
 

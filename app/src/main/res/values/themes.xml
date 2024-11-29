@@ -9,6 +9,10 @@
         <item name="colorAccent">@color/warningWhite</item>
         <item name="contrast">@color/generalBlack</item>
         <item name="fontFamily">@font/howdy_lemon</item>
+
+
+        <item name="android:panelColorBackground">@color/primaryWhite</item>
+
     </style>
 
     <style name="Theme.LinGame" parent="Base.Theme.LinGame" />

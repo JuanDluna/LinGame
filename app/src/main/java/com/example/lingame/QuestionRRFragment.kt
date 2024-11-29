@@ -2,6 +2,8 @@ package com.example.lingame
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.os.Handler
@@ -92,7 +94,10 @@ class QuestionRRFragment : Fragment() {
         }
     }
 
+    // Variables de instancia
     private lateinit var question: Question
+    private lateinit var sharedPreferences : SharedPreferences
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -104,6 +109,8 @@ class QuestionRRFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        sharedPreferences = requireActivity().getSharedPreferences(R.string.sharedPreferencesName.toString(), MODE_PRIVATE)
+
         question = arguments?.getParcelable(ARG_QUESTION) ?: return
 
         val questionTextView: TextView = view.findViewById(R.id.questionTextView)
@@ -114,8 +121,8 @@ class QuestionRRFragment : Fragment() {
             view.findViewById(R.id.answerButton4)
         )
 
-        val selectedLanguage = "es" // Cambiar esto según la lógica de selección de idioma
-        questionTextView.text = question.getQuestionInLanguage(selectedLanguage)
+        val selectedLanguage =  sharedPreferences.getString(R.string.selectedLanguagePreferences.toString(), null)// Cambiar esto según la lógica de selección de idioma
+        questionTextView.text = question.getQuestionInLanguage(selectedLanguage!!)
 
         val answers = question.answers
         for ((index, button) in answerButtons.withIndex()) {

@@ -18,13 +18,15 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.google.firestore.v1.Cursor
 import java.io.File
 import java.net.URI
 import kotlin.math.exp
 import kotlin.math.roundToInt
 
-class GameLogicaActivity : AppCompatActivity() {
+class GameLogicaActivity : FragmentActivity() {
 
     // Elementos del HUD
     private lateinit var playerAvatar: ImageView
@@ -32,7 +34,6 @@ class GameLogicaActivity : AppCompatActivity() {
     private lateinit var experienceBar: ProgressBar
     private lateinit var menuButton: ButtonDropdownMenu
     private lateinit var languageSelector: ButtonDropdownMenu
-    private lateinit var surfaceView: SurfaceView
 
     private lateinit var dbHelper: DBSQLite
     private lateinit var preferences: SharedPreferences
@@ -46,6 +47,13 @@ class GameLogicaActivity : AppCompatActivity() {
         Log.d("GameLogicaActivity", "Shared Preferences : ${preferences.all}")
 
         setContentView(R.layout.activity_gamelogica)
+
+        // Incluir el componente de juego
+        if(savedInstanceState == null){
+            supportFragmentManager.
+            beginTransaction().
+            replace(R.id.fragment_game_container, GameActivity()).commit()
+        }
 
         // Inicializar vistas del HUD
         initHudElements()
@@ -65,7 +73,7 @@ class GameLogicaActivity : AppCompatActivity() {
         experienceBar = findViewById(R.id.experienceBar)
         menuButton = findViewById(R.id.menuButton)
         languageSelector = findViewById(R.id.languageSelector)
-        surfaceView = findViewById<SurfaceView>(R.id.gameSurfaceView)
+//        surfaceView = findViewById<SurfaceView>(R.id.gameSurfaceView)
 
         val UID = preferences.getString(R.string.UID_Preferences.toString(), null)
         Log.d("GameLogicaActivity", "Usuario logueado: ${UID}")
@@ -116,11 +124,6 @@ class GameLogicaActivity : AppCompatActivity() {
             experienceBar.progress = ((level ?: 0f - (level ?: 0f).toInt()) * 100).toInt()
         } else {
             Log.d("GameLogicaActivity", "Cursor nulo o vacío")
-        }
-
-
-        surfaceView.setOnClickListener{
-            showToast("Click en SurfaceView")
         }
 
 
@@ -176,7 +179,8 @@ class GameLogicaActivity : AppCompatActivity() {
      * Lógica para cambiar el idioma.
      */
     private fun changeLanguage(languageCode: String) {
-        Toast.makeText(this, "Idioma cambiado a $languageCode", Toast.LENGTH_SHORT).show()
+        preferences.edit().putString(R.string.selectedLanguagePreferences.toString(), languageCode).apply()
+
         // Implementar cambio de idioma en el juego
     }
 

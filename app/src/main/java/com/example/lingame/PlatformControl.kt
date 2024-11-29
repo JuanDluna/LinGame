@@ -1,89 +1,112 @@
 package com.example.lingame
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
-import android.view.View
+import android.view.animation.LinearInterpolator
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageView
+import com.google.android.material.card.MaterialCardView
 
 class PlatformControl @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr) {
-    private val platformPaint = Paint().apply {
-        color = Color.BLUE
-        style = Paint.Style.FILL
-    }
+) : MaterialCardView(context, attrs, defStyleAttr) {
 
-    private val shadowPaint = Paint().apply {
-        color = Color.GRAY
-        style = Paint.Style.FILL
-        alpha = 120
-    }
+    var category: String? = null // Atributo para la categoría (norte, sur, este, oeste)
+    var targetActivity: Class<out AppCompatActivity>? = null // Atributo para targetActivity
 
-    private val platformRect = RectF(0f, 0f, 250f, 125f) // Example rectangle
-    var targetActivity: Class<out AppCompatActivity>? = null
+    private var animator: ValueAnimator? = null
 
     init {
-        // Asegúrate de que el control sea "clickeable"
+        // Configuración básica del MaterialCardView para hacerlo más pequeño y redondeado
+        val platformDiameter = 150f // Diámetro de la plataforma (ajustado para que sea más pequeña)
+        radius = platformDiameter / 2 // Radio para hacer la forma circular
+        cardElevation = 8f // Elevación constante
+        setCardBackgroundColor(Color.parseColor("#FF6200EE")) // Color de fondo (puedes cambiarlo)
         isClickable = true
+        isFocusable = true
 
-        // Leer los atributos XML personalizados
-        attrs?.let {
-            val typedArray = context.obtainStyledAttributes(it, R.styleable.PlatformControl, 0, 0)
-            val targetActivityName = typedArray.getString(R.styleable.PlatformControl_targetActivity)
-            typedArray.recycle()
+        layoutParams = LayoutParams(platformDiameter.toInt(), platformDiameter.toInt()) // Establece el tamaño de la plataforma
 
-            // Si se ha proporcionado el nombre de la actividad, obtener la clase
-            targetActivityName?.let { activityName ->
-                targetActivity = try {
-                    Class.forName(activityName) as Class<out AppCompatActivity>
-                } catch (e: ClassNotFoundException) {
-                    e.printStackTrace() // Manejar el error si no se encuentra la clase
-                    null
+        setOnClickListener {
+            try {
+                performClickAction()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        // Iniciar la animación pasiva con un retraso
+        startLevitationAnimationWithDelay()
+    }
+
+    // Método para iniciar la animación de levitación con un pequeño retraso
+    private fun startLevitationAnimationWithDelay() {
+        val randomDelay = (100..1000).random().toLong() // Retraso aleatorio entre 100ms y 1 segundo
+
+        // Usamos Handler para crear el retraso de la animación
+        Handler(Looper.getMainLooper()).postDelayed({
+            // Iniciar animación en el hilo principal
+            startLevitationAnimation()
+        }, randomDelay)
+    }
+
+    private fun startLevitationAnimation() {
+        // Animator que cambia la posición vertical (Y) de la plataforma
+        animator = ValueAnimator.ofFloat(0f, 30f) // Movimiento vertical (puedes ajustar el rango)
+        animator?.apply {
+            duration = 1000 // Duración del ciclo (1 segundo)
+            repeatCount = ValueAnimator.INFINITE // Repite indefinidamente
+            repeatMode = ValueAnimator.REVERSE // Hace que suba y baje
+            interpolator = LinearInterpolator() // Hace que el movimiento sea suave y lineal
+
+            // Este `addUpdateListener` se ejecutará en el hilo principal
+            addUpdateListener { animation ->
+                val value = animation.animatedValue as Float
+                translationY = value // Actualiza la posición vertical de la plataforma en la UI principal
+            }
+            start()
+        }
+    }
+
+    private fun stopLevitationAnimation() {
+        animator?.cancel() // Detiene la animación si es necesario
+    }
+
+    private fun performClickAction() {
+        if (targetActivity != null) {
+            // Si hay una actividad objetivo, lanzar esa actividad
+            val intent = Intent(context, targetActivity)
+            context.startActivity(intent)
+        } else {
+            // Si no hay una actividad objetivo, manejar según la categoría
+            when (category) {
+                "norte" -> {
+                    val intent = Intent(context, RetoRapidoActivity::class.java)
+                    context.startActivity(intent)
+                }
+                "este" -> {
+                    val intent = Intent(context, ParafraseaActivity::class.java)
+                    context.startActivity(intent)
+                }
+                else -> {
+                    // Manejo de categorías no asignadas
                 }
             }
         }
     }
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val desiredWidth = (platformRect.width() + 20).toInt() // Add shadow offset
-        val desiredHeight = (platformRect.height() + 20).toInt() // Add shadow offset
 
-        val width = resolveSize(desiredWidth, widthMeasureSpec)
-        val height = resolveSize(desiredHeight, heightMeasureSpec)
-
-        setMeasuredDimension(width, height)
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        startLevitationAnimationWithDelay() // Inicia la animación con un retraso cuando el control es agregado a la vista
     }
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        val shadowOffset = 20f
-
-        // Draw shadow
-        canvas.drawRect(
-            platformRect.left + shadowOffset,
-            platformRect.top + shadowOffset,
-            platformRect.right + shadowOffset,
-            platformRect.bottom + shadowOffset,
-            shadowPaint
-        )
-
-        // Draw platform
-        canvas.drawRect(platformRect, platformPaint)
-    }
-
-    override fun performClick(): Boolean {
-        super.performClick()
-
-        // Abrir la actividad correspondiente cuando se haga clic
-        targetActivity?.let { activity ->
-            val intent = Intent(context, activity)
-            context.startActivity(intent)
-        }
-
-        return true
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        stopLevitationAnimation() // Detiene la animación si el control es removido
     }
 }

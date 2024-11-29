@@ -5,10 +5,13 @@
     android:layout_height="match_parent">
 
     <!-- Fondo del juego -->
-    <SurfaceView
-        android:id="@+id/gameSurfaceView"
+    <FrameLayout
+        android:id="@+id/fragment_game_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_margin="24dp"
+        android:padding="16dp" />
+
 
     <!-- HUD superpuesto -->
     <LinearLayout
