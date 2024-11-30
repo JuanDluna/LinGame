@@ -44,7 +44,7 @@ class ParafraseaActivity : FragmentActivity() {
                         }
                     }
                     phrases.shuffle()
-                    wordList = phrases.take(5).map { Word(it, it.shuffled()) }  // Usamos la data class aquí
+                    wordList = phrases.take(5).map { Word(it, it) }  // Usamos la data class aquí
                     Log.d("ParafraseaActivity", "Frases cargadas: ${wordList.joinToString()}")
                     showPhraseFragment()
                 }
