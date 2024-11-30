@@ -147,6 +147,11 @@ class RegisterActivity : AppCompatActivity() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = firebaseAuth.currentUser
+                    if (bitmapPhoto == null) {
+                        Log.i("RegisterActivity", "Using default avatar")
+                        val defaultDrawable = resources.getDrawable(R.drawable.avatar_base_png, null)
+                        bitmapPhoto = (defaultDrawable as BitmapDrawable).bitmap
+                    }
                     val filePath = saveImageToLocalStorage(bitmapPhoto)
                     Log.d("RegisterActivity", "File path: $filePath")
                     saveUserToDatabase(nombre, correo, filePath)
@@ -263,9 +268,9 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun uploadImageToFirebaseStorage(user: FirebaseUser?) {
-        val bitmap = (bnAvatar.drawable as BitmapDrawable).bitmap
+
         val byteArrayOutputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        bitmapPhoto!!.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         val data = byteArrayOutputStream.toByteArray()
 
         val imageRef = storageReference.child("avatars/${user?.uid}.jpg")
@@ -291,6 +296,9 @@ class RegisterActivity : AppCompatActivity() {
 
         user?.let {
             dbRef.collection("users").document(it.uid).update(userMap as Map<String, Any>)
+                .addOnSuccessListener {
+                    Log.i("RegisterActivity", "URL de imagen guardada en Firestore")
+                }
                 .addOnFailureListener {
                     showToast("Error al guardar URL de imagen: ${it.message}")
                 }
@@ -312,7 +320,12 @@ class RegisterActivity : AppCompatActivity() {
             "isLanguagesSelected" to false,
             "selectedLanguages" to listOf<String>()
         )
-        firebaseFirestore.collection("users").document(user!!.uid).set(userMap)
+        firebaseFirestore.collection("users").document(user!!.uid).set(userMap).
+                addOnSuccessListener {
+            Log.d("RegisterActivity", "Usuario guardado en Firestore")
+        }.addOnFailureListener {
+            Log.e("RegisterActivity", "Error al guardar usuario en Firestore: ${it.message}")
+        }
     }
 
     private fun saveUserToDatabase(name: String, email: String, photo_path: String) {
