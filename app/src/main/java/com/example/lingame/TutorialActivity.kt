@@ -1,8 +1,6 @@
 package com.example.lingame
 
-import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 
 class TutorialActivity : AppCompatActivity() {
@@ -14,7 +12,6 @@ class TutorialActivity : AppCompatActivity() {
         val platformControl1 = findViewById<PlatformControl>(R.id.platformControl)
         //TODO Implementar actividad de tutorial
 
-
-        platformControl1.targetActivity = LoginActivity::class.java
+        platformControl1.targetActivity = GameLogicaActivity::class.java
     }
 }

@@ -8,8 +8,8 @@ import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.view.animation.LinearInterpolator
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatImageView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.google.android.material.card.MaterialCardView
 
 class PlatformControl @JvmOverloads constructor(
@@ -17,7 +17,8 @@ class PlatformControl @JvmOverloads constructor(
 ) : MaterialCardView(context, attrs, defStyleAttr) {
 
     var category: String? = null // Atributo para la categoría (norte, sur, este, oeste)
-    var targetActivity: Class<out AppCompatActivity>? = null // Atributo para targetActivity
+    var targetActivity: Class<out FragmentActivity>? = null // Atributo para targetActivity
+    var targetFragment: Class<out Fragment>? = null // Atributo para targetFragment
 
     private var animator: ValueAnimator? = null
 
@@ -82,8 +83,15 @@ class PlatformControl @JvmOverloads constructor(
             // Si hay una actividad objetivo, lanzar esa actividad
             val intent = Intent(context, targetActivity)
             context.startActivity(intent)
+        } else if (targetFragment != null && context is FragmentActivity) {
+            // Si hay un fragmento objetivo, reemplazar el fragmento actual
+            val fragment = targetFragment!!.newInstance()
+            (context as FragmentActivity).supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
         } else {
-            // Si no hay una actividad objetivo, manejar según la categoría
+            // Si no hay una actividad o fragmento objetivo, manejar según la categoría
             when (category) {
                 "norte" -> {
                     val intent = Intent(context, RetoRapidoActivity::class.java)
