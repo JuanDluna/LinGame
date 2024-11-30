@@ -1,6 +1,5 @@
 package com.example.lingame
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
@@ -20,7 +19,6 @@ class RetoRapidoActivity : FragmentActivity() {
     private lateinit var scoreBar: scoreBar
     private lateinit var timer: TextView
 
-    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var database: DatabaseReference
     private var questionsList = mutableListOf<Question>()
     private var currentQuestionIndex = 0 // Control del índice de la pregunta actual
@@ -30,7 +28,6 @@ class RetoRapidoActivity : FragmentActivity() {
         setContentView(R.layout.activity_reto_rapido)
 
         // Inicializar SharedPreferences
-        sharedPreferences = getSharedPreferences(R.string.sharedPreferencesName.toString(), MODE_PRIVATE)
 
         // Inicializar Firebase Database
         database = FirebaseDatabase.getInstance().reference.child("languages").child("reto_rapido")

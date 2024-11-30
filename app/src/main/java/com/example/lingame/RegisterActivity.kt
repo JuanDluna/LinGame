@@ -112,7 +112,7 @@ class RegisterActivity : AppCompatActivity() {
         callbackManager = CallbackManager.Factory.create()
 
         db = DBSQLite(this)
-        sharedPreferences = getSharedPreferences(R.string.sharedPreferencesName.toString(), Context.MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(getString(R.string.sharedPreferencesName), Context.MODE_PRIVATE)
 
     }
 
@@ -281,8 +281,8 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun userIsLogged() {
-        sharedPreferences.edit().putBoolean(R.string.isLoggedInPreferences.toString(), true).apply()
-        sharedPreferences.edit().putString(R.string.UID_Preferences.toString(), firebaseAuth.currentUser?.uid).apply()
+        sharedPreferences.edit().putBoolean(getString(R.string.isLoggedInPreferences), true).apply()
+        sharedPreferences.edit().putString(getString(R.string.UID_Preferences), firebaseAuth.currentUser?.uid).apply()
     }
 
     private fun saveUserImageUriToDatabase(user: FirebaseUser?, imageUrl: String) {
@@ -308,7 +308,9 @@ class RegisterActivity : AppCompatActivity() {
         val userMap = hashMapOf(
             "name" to name,
             "email" to email,
-            "isLanguagesSelected" to false
+            "generalLevel" to 0F,
+            "isLanguagesSelected" to false,
+            "selectedLanguages" to listOf<String>()
         )
         firebaseFirestore.collection("users").document(user!!.uid).set(userMap)
     }

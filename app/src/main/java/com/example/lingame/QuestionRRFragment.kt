@@ -109,7 +109,7 @@ class QuestionRRFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedPreferences = requireActivity().getSharedPreferences(R.string.sharedPreferencesName.toString(), MODE_PRIVATE)
+        sharedPreferences = requireActivity().getSharedPreferences(getString(R.string.sharedPreferencesName), MODE_PRIVATE)
 
         question = arguments?.getParcelable(ARG_QUESTION) ?: return
 
@@ -121,7 +121,7 @@ class QuestionRRFragment : Fragment() {
             view.findViewById(R.id.answerButton4)
         )
 
-        val selectedLanguage =  sharedPreferences.getString(R.string.selectedLanguagePreferences.toString(), null)// Cambiar esto según la lógica de selección de idioma
+        val selectedLanguage =  sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)// Cambiar esto según la lógica de selección de idioma
         questionTextView.text = question.getQuestionInLanguage(selectedLanguage!!)
 
         val answers = question.answers

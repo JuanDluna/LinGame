@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
     var isLoggedIn : Boolean? = null
     var selectedLanguage : String? = null
     var isLanguagesSelected : Boolean? = null
-    var sharedPreferences : SharedPreferences? = null
+    lateinit var sharedPreferences : SharedPreferences
 
     // Variable para usar en pruebas
     private var debbugerMode = false
@@ -31,18 +31,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Verificar si el usuario ya está logueado
-        sharedPreferences = getSharedPreferences(R.string.sharedPreferencesName.toString(), MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(getString(R.string.sharedPreferencesName), MODE_PRIVATE)
 
         // TODO: Borrar cuando se acabe el momento de pruebas
 //        sharedPreferences.edit().clear().apply()
 
-        UID  = sharedPreferences!!.getString(R.string.UID_Preferences.toString(), null)
-        isLoggedIn = sharedPreferences!!.getBoolean(R.string.isLoggedInPreferences.toString(), false)
-        selectedLanguage = sharedPreferences!!.getString(R.string.selectedLanguagePreferences.toString(), null)
+        UID  = sharedPreferences.getString(getString(R.string.UID_Preferences), null)
+        isLoggedIn = sharedPreferences.getBoolean(getString(R.string.isLoggedInPreferences), false)
+        selectedLanguage = sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)
 
 
 
-        Log.d("MainActivity", "Shared Preferences : ${sharedPreferences!!.all}")
+        Log.d("MainActivity", "Shared Preferences : ${sharedPreferences.all}")
 
         try {
             fireStore.collection("users").document(UID.toString()).get().

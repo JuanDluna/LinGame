@@ -67,7 +67,7 @@ class LoginActivity : AppCompatActivity() {
 
         // Inicializar la base de datos SQLite y variables locales
         dbsqLite = DBSQLite(this)
-        sharedPreferences = getSharedPreferences(R.string.sharedPreferencesName.toString(), Context.MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(getString(R.string.sharedPreferencesName), Context.MODE_PRIVATE)
 
         // Manejo de inicio de sesión por correo y contraseña
         btnIniciarSesion.setOnClickListener {
@@ -139,19 +139,23 @@ class LoginActivity : AppCompatActivity() {
                     val name = user.displayName ?: data["name"] as? String ?: "Usuario"
                     val photoUrl = user.photoUrl?.toString() ?: data["avatarUrl"] as? String ?: ""
                     val generalLevel = data["generalLevel"] as? Double ?: 0.0
-                    val englishLevel = data["englishLevel"] as? Map<String, Int> ?: emptyMap()
-                    val frenchLevel = data["frenchLevel"] as? Map<String, Int> ?: emptyMap()
+                    val idiomas = data["idiomas"] as? Map<*,*> ?: emptyMap<Any, Any>()
                     val portugueseLevel = data["portugueseLevel"] as? Map<String, Int> ?: emptyMap()
+                    val languagesSelected = data["selectedLanguages"] as List<String>
                     isLanguageSelected = data["isLanguagesSelected"] as? Boolean ?: false
 
                     Log.d("LoginActivity", "Datos obtenidos: $data")
+
+                    val englishLevel = idiomas.get("Inglés") as? Map<String, Int> ?: emptyMap()
+                    val frenchLevel = idiomas.get("Francés") as? Map<String, Int> ?: emptyMap()
 
                     saveUserToLocalDatabase(userId, name, email, photoUrl,generalLevel, englishLevel, frenchLevel, portugueseLevel)
 
                     // Marcar como logueado
                     sharedPreferences.edit().apply {
-                        putBoolean(R.string.isLoggedInPreferences.toString(), true)
-                        putString(R.string.UID_Preferences.toString(), userId)
+                        putBoolean(getString(R.string.isLoggedInPreferences), true)
+                        putString(getString(R.string.UID_Preferences), userId)
+                        putStringSet(getString(R.string.listOfLanguagesPreferences), languagesSelected.toSet())
                         apply()
                     }
 

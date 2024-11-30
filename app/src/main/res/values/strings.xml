@@ -11,6 +11,7 @@
     <string name="isLoggedInPreferences">isLoggedIn</string>
     <string name="UID_Preferences">UID</string>
     <string name="selectedLanguagePreferences">selectedLanguage</string>
+    <string name="listOfLanguagesPreferences">listLanguages</string>
     <string name="englishValuePreferences">en</string>
     <string name="frenchValuePreferences">fr</string>
     <string name="portugueseValuePreferences">pr</string>

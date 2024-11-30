@@ -24,7 +24,7 @@ class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         private const val COLUMN_NAME = "name"
         private const val COLUMN_EMAIL = "email"
         private const val COLUMN_PHOTO_URL = "photo_url"
-        private const val COLUMN_GENERAL_LEVEL = "generalLevel"  // Nueva columna
+        private const val COLUMN_GENERAL_LEVEL = "generalLevel"
 
         // Columnas de las tablas de niveles de idiomas
         private const val COLUMN_LEVEL_CREA_HISTORIA = "levelCreaHistoria"
@@ -41,7 +41,7 @@ class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, nul
                     "$COLUMN_NAME TEXT," +
                     "$COLUMN_EMAIL TEXT," +
                     "$COLUMN_PHOTO_URL TEXT," +
-                    "$COLUMN_GENERAL_LEVEL REAL DEFAULT 0.0)"  // Agregamos la columna generalLevel
+                    "$COLUMN_GENERAL_LEVEL REAL DEFAULT 0.0)"
         )
 
         // Las tablas de idiomas se crean solo si el usuario tiene una relación con el idioma

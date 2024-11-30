@@ -48,7 +48,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
             val selectedLanguages = getSelectedLanguages()
             if (selectedLanguages.isNotEmpty()) {
                 val languages = selectedLanguages.joinToString(", ")
-                val UID = FirebaseAuth.getInstance().currentUser?.uid ?: sharedPreferences.getString(R.string.UID_Preferences.toString(), null)
+                val UID = FirebaseAuth.getInstance().currentUser?.uid ?: sharedPreferences.getString(getString(R.string.UID_Preferences), null)
                 Toast.makeText(this, "Idiomas seleccionados: $languages", Toast.LENGTH_SHORT).show()
 
                 selectedLanguages.forEach { language ->
@@ -62,21 +62,12 @@ class LanguageSelectionActivity : AppCompatActivity() {
                     // Guardar los idiomas en Firestore
                     firestore.collection("users").
                     document(UID.toString()).
-                    collection("idiomas").document(language).set(languagesMap).
+                    collection("nivelIdiomas").document(language).set(languagesMap).
                     addOnFailureListener(
                         {
                             Toast.makeText(this, "Error al guardar los idiomas", Toast.LENGTH_SHORT).show()
                         }
                     );
-
-                    // Modificar el valor de languagesSelected en Firestore
-                    firestore.collection("users").document(UID.toString()).update("isLanguagesSelected", true)
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Idiomas guardados correctamente", Toast.LENGTH_SHORT).show()
-                    }.addOnFailureListener {
-                        Toast.makeText(this, "Error al guardar los idiomas", Toast.LENGTH_SHORT).show()
-                    }
-
                     // Crear tablas default en SQLite
                     when (language) {
                         "Inglés" -> dbHelper.createEnglishTable(UID.toString())
@@ -85,6 +76,17 @@ class LanguageSelectionActivity : AppCompatActivity() {
                     }
 
                 }
+
+                // Modificar el valor de languagesSelected en Firestore
+                firestore.collection("users").document(UID.toString()).update("isLanguagesSelected", true)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Idiomas guardados correctamente", Toast.LENGTH_SHORT).show()
+                    }.addOnFailureListener {
+                        Toast.makeText(this, "Error al guardar los idiomas", Toast.LENGTH_SHORT).show()
+                    }
+
+                firestore.collection("users").document(UID.toString()).update("selectedLanguages", selectedLanguages)
+
                 val intent = Intent(this, TutorialActivity::class.java)
                 startActivity(intent)
             } else {
@@ -99,6 +101,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
         if (checkboxIngles.isChecked) selectedLanguages.add("Inglés")
         if (checkboxFrances.isChecked) selectedLanguages.add("Francés")
         if (checkboxPortugues.isChecked) selectedLanguages.add("Portugués")
+        sharedPreferences.edit().putStringSet(getString(R.string.listOfLanguagesPreferences), selectedLanguages.toSet()).apply()
         return selectedLanguages
     }
 }

@@ -20,6 +20,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firestore.v1.Cursor
 import java.io.File
 import java.net.URI
@@ -43,7 +44,7 @@ class GameLogicaActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
 
         dbHelper = DBSQLite(this)
-        preferences = getSharedPreferences(R.string.sharedPreferencesName.toString(), Context.MODE_PRIVATE)
+        preferences = getSharedPreferences(getString(R.string.sharedPreferencesName), Context.MODE_PRIVATE)
         Log.d("GameLogicaActivity", "Shared Preferences : ${preferences.all}")
 
         setContentView(R.layout.activity_gamelogica)
@@ -75,7 +76,7 @@ class GameLogicaActivity : FragmentActivity() {
         languageSelector = findViewById(R.id.languageSelector)
 //        surfaceView = findViewById<SurfaceView>(R.id.gameSurfaceView)
 
-        val UID = preferences.getString(R.string.UID_Preferences.toString(), null)
+        val UID = preferences.getString(getString(R.string.UID_Preferences), null)
         Log.d("GameLogicaActivity", "Usuario logueado: ${UID}")
 
         var cursorDb: android.database.Cursor? = null
@@ -154,18 +155,44 @@ class GameLogicaActivity : FragmentActivity() {
      * Configura el selector de idioma.
      */
     private fun setupLanguageSelector() {
+        var listOfLanguages = preferences.getStringSet(getString(R.string.listOfLanguagesPreferences), null)
+        var selectedLanguage = preferences.getString(getString(R.string.selectedLanguagePreferences), null)
+        Log.i("GameLogicaActivity", "Idiomas seleccionados: ${listOfLanguages}")
+        var DropdownOptions = mutableMapOf<String, Drawable>()
 
-        languageSelector.setDropdownOptions(mapOf(
-            "Inglés" to getDrawable(R.drawable.banderausa)!!,
-            "Portugués" to getDrawable(R.drawable.banderabrasil)!!,
-            "Francés" to getDrawable(R.drawable.banderafrancia)!!
-        ))
+        if (selectedLanguage == null){
+            selectedLanguage = listOfLanguages!!.take(1).toString()
+            listOfLanguages.remove(selectedLanguage)
+            preferences.edit().putStringSet(getString(R.string.listOfLanguagesPreferences), listOfLanguages).apply()
+
+            when(selectedLanguage){
+                "Inglés" -> selectedLanguage = getString(R.string.englishValuePreferences)
+                "Francés" -> selectedLanguage = getString(R.string.frenchValuePreferences)
+                "Portugués" -> selectedLanguage = getString(R.string.portugueseValuePreferences)
+            }
+            preferences.edit().putString(getString(R.string.selectedLanguagePreferences), selectedLanguage).apply()
+        }
+        when(selectedLanguage){
+            getString(R.string.portugueseValuePreferences) -> languageSelector.setImageDrawable(getDrawable(R.drawable.banderabrasil))
+            getString(R.string.englishValuePreferences) -> languageSelector.setImageDrawable(getDrawable(R.drawable.banderausa))
+            getString(R.string.frenchValuePreferences) -> languageSelector.setImageDrawable(getDrawable(R.drawable.banderafrancia))
+        }
+
+        listOfLanguages!!.forEach { language ->
+            when(language){
+                "Portugués" -> DropdownOptions.put("Portugués", getDrawable(R.drawable.banderabrasil)!!)
+                "Inglés" -> DropdownOptions.put("Inglés", getDrawable(R.drawable.banderausa)!!)
+                "Francés" -> DropdownOptions.put("Francés", getDrawable(R.drawable.banderafrancia)!!)
+            }
+        }
+
+        languageSelector.setDropdownOptions(DropdownOptions)
 
         languageSelector.setOnOptionClickListener { language ->
             when (language) {
-                "Portugués" -> changeLanguage("pr")
-                "Inglés" -> changeLanguage("en")
-                "Francés" -> changeLanguage("fr")
+                "Portugués" -> changeLanguage(getString(R.string.portugueseValuePreferences))
+                "Inglés" -> changeLanguage(getString(R.string.englishValuePreferences))
+                "Francés" -> changeLanguage(getString(R.string.frenchValuePreferences))
                 else -> Toast.makeText(this, "Idioma no reconocido", Toast.LENGTH_SHORT).show()
             }
         }
@@ -179,9 +206,19 @@ class GameLogicaActivity : FragmentActivity() {
      * Lógica para cambiar el idioma.
      */
     private fun changeLanguage(languageCode: String) {
-        preferences.edit().putString(R.string.selectedLanguagePreferences.toString(), languageCode).apply()
+        preferences.edit().putString(getString(R.string.selectedLanguagePreferences), languageCode).apply()
+        showToast("Idioma cambiado a $languageCode")
+        setDrawableOfSelector();
+    }
 
-        // Implementar cambio de idioma en el juego
+    private fun setDrawableOfSelector(){
+        val selectedLanguage = preferences.getString(getString(R.string.selectedLanguagePreferences), null)
+
+        when(selectedLanguage){
+            getString(R.string.portugueseValuePreferences) -> languageSelector.setImageDrawable(getDrawable(R.drawable.banderabrasil))
+            getString(R.string.englishValuePreferences) -> languageSelector.setImageDrawable(getDrawable(R.drawable.banderausa))
+            getString(R.string.frenchValuePreferences) -> languageSelector.setImageDrawable(getDrawable(R.drawable.banderafrancia))
+        }
     }
 
     /**
