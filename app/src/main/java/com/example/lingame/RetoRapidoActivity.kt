@@ -105,7 +105,7 @@ class RetoRapidoActivity : FragmentActivity() {
         } else if (currentQuestionIndex == questionsList.size  ) {
             Toast.makeText(this, "¡Fin del juego!", Toast.LENGTH_SHORT).show()
             var intent = Intent()
-            intent.putExtra("score", scoreBar.getScore())
+            intent.putExtra("win", scoreBar.isFirstStarReached())
             setResult(RESULT_OK, intent)
             finish()
         }

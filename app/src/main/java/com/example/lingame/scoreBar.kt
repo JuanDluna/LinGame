@@ -117,4 +117,7 @@ class scoreBar @JvmOverloads constructor(
     fun getScore(): Int {
         return progress
     }
+    fun isFirstStarReached() : Boolean {
+        return stars[0].isReached
+    }
 }
