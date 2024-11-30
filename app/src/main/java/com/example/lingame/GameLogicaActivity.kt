@@ -158,7 +158,6 @@ class GameLogicaActivity : FragmentActivity() {
         var listOfLanguages = preferences.getStringSet(getString(R.string.listOfLanguagesPreferences), null)
         var selectedLanguage = preferences.getString(getString(R.string.selectedLanguagePreferences), null)
         Log.i("GameLogicaActivity", "Idiomas seleccionados: ${listOfLanguages}")
-        var DropdownOptions = mutableMapOf<String, Drawable>()
 
         if (selectedLanguage == null || selectedLanguage == "es" || selectedLanguage.isEmpty()) {
             // Obtener el primer idioma disponible de la lista
@@ -178,22 +177,13 @@ class GameLogicaActivity : FragmentActivity() {
 
             // Actualizar el selector visual
             setDrawableOfSelector()
+        }else{
+            setDrawableOfSelector()
         }
 
+        setDropdownOptions( listOfLanguages, selectedLanguage)
 
 
-        listOfLanguages!!.forEach { language ->
-            if (language == selectedLanguage){
-                return
-            }
-            when(language){
-                "Portugués" -> DropdownOptions.put("Portugués", getDrawable(R.drawable.banderabrasil)!!)
-                "Inglés" -> DropdownOptions.put("Inglés", getDrawable(R.drawable.banderausa)!!)
-                "Francés" -> DropdownOptions.put("Francés", getDrawable(R.drawable.banderafrancia)!!)
-            }
-        }
-
-        languageSelector.setDropdownOptions(DropdownOptions)
 
         languageSelector.setOnOptionClickListener { language ->
             when (language) {
@@ -214,8 +204,38 @@ class GameLogicaActivity : FragmentActivity() {
      */
     private fun changeLanguage(languageCode: String) {
         preferences.edit().putString(getString(R.string.selectedLanguagePreferences), languageCode).apply()
-        showToast("Idioma cambiado a $languageCode")
         setDrawableOfSelector();
+        setDropdownOptions( listOfLanguages = preferences.getStringSet(getString(R.string.listOfLanguagesPreferences), null), selectedLanguage = languageCode )
+    }
+
+    private fun setDropdownOptions(listOfLanguages : Set<String>?, selectedLanguage : String?){
+        var DropdownOptions = mutableMapOf<String, Drawable>()
+
+        listOfLanguages!!.forEach { language ->
+            Log.i("GameLogicaActivity", "Idioma: ${language}")
+            Log.i("GameLogicaActivity", "Idioma seleccionado: ${selectedLanguage}")
+
+            when(language){
+                "Portugués" ->{
+                    if (selectedLanguage != "pr"){
+                        DropdownOptions.put("Portugués", getDrawable(R.drawable.banderabrasil)!!)
+                    }
+                }
+                "Inglés" ->{
+                    if (selectedLanguage != "en"){
+                        DropdownOptions.put("Inglés", getDrawable(R.drawable.banderausa)!!)
+                    }
+                }
+                "Francés" ->{
+                    if (selectedLanguage != "fr"){
+                        DropdownOptions.put("Francés", getDrawable(R.drawable.banderafrancia)!!)
+                    }
+                }
+            }
+        }
+
+        languageSelector.setDropdownOptions(DropdownOptions)
+
     }
 
     private fun setDrawableOfSelector(){

@@ -5,9 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.contains
 import androidx.fragment.app.Fragment
+import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.button.MaterialButton
 
 class PhraseFragment : Fragment() {
@@ -16,8 +19,8 @@ class PhraseFragment : Fragment() {
         private val phrasesList = phrases
         private var index = 0
 
-        fun shufflePhrases(): List<String> {
-            return phrasesList.shuffled()
+        fun getActualPhrase(): String {
+            return phrasesList.get(index)
         }
 
         fun nextPhrase(): String {
@@ -29,6 +32,9 @@ class PhraseFragment : Fragment() {
             return index >= phrasesList.size - 1
         }
 
+        fun isEmpty(): Boolean {
+            return phrasesList.isEmpty()
+        }
     }
 
     companion object {
@@ -41,9 +47,10 @@ class PhraseFragment : Fragment() {
             }
         }
     }
+    private lateinit var wordContainer: FlexboxLayout
+    private lateinit var answerContainer: FlexboxLayout
+    private lateinit var nextButton: MaterialButton
 
-    private lateinit var wordContainer: LinearLayout
-    private lateinit var answerContainer: LinearLayout
     private val selectedWords = mutableListOf<String>()
     private var wordsOfPhrase = mutableListOf<String>()
 
@@ -53,9 +60,10 @@ class PhraseFragment : Fragment() {
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_phrase, container, false)
 
-        // Inicializar contenedores
+        // Inicializar vistas
         wordContainer = rootView.findViewById(R.id.word_container)
         answerContainer = rootView.findViewById(R.id.answer_container)
+        nextButton = rootView.findViewById(R.id.next_button)
 
         // Obtener la frase y dividirla en palabras mezcladas
         val phrase = arguments?.getString("phrase") ?: ""
@@ -68,7 +76,10 @@ class PhraseFragment : Fragment() {
         }
 
         configureShuffledWords(wordsOfPhrase)
-        rootView.findViewById<View>(R.id.next_button).setOnClickListener { onNextButtonClicked() }
+
+        // Configurar el botón
+        nextButton.text = "Revisar frase" // Texto inicial
+        nextButton.setOnClickListener { onNextButtonClicked(phrase) }
 
         return rootView
     }
@@ -90,26 +101,76 @@ class PhraseFragment : Fragment() {
             setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.white))
             setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
             setOnClickListener { onWordSelected(this) }
+            textSize = 18f // Aumentar el tamaño de la fuente
         }
     }
 
     private fun onWordSelected(button: MaterialButton) {
         val word = button.text.toString()
-        selectedWords.add(word)
-
-        // Mover palabra al contenedor de respuestas
-        wordContainer.removeView(button)
-        answerContainer.addView(createWordButton(word))
+        if (answerContainer.contains(button)) {
+            // Mover palabra de regreso al contenedor de palabras
+            answerContainer.removeView(button)
+            wordContainer.addView(button)
+            selectedWords.remove(word)
+        } else {
+            // Mover palabra al contenedor de respuestas
+            wordContainer.removeView(button)
+            answerContainer.addView(button)
+            selectedWords.add(word)
+        }
     }
 
-    private fun onNextButtonClicked() {
-        val userAnswer = selectedWords.joinToString(" ")
-        val isCorrect = isCorrectAnswer(userAnswer)
-        (activity as? ParafraseaActivity)?.onPhraseCompleted(isCorrect)
+    private fun onNextButtonClicked(correctPhrase: String) {
+        if (nextButton.text == "Revisar frase") {
+            // Revisar la frase y mostrar retroalimentación
+            val userAnswer = selectedWords.joinToString(" ")
+            checkPhrase(userAnswer, correctPhrase)
+
+            // Cambiar el texto del botón
+            nextButton.text = "Siguiente frase"
+        } else {
+            // Pasar a la siguiente frase
+            (activity as? ParafraseaActivity)?.onPhraseCompleted(true)
+        }
     }
 
-    private fun isCorrectAnswer(userAnswer: String): Boolean {
-        val originalPhrase = arguments?.getString("phrase") ?: ""
-        return userAnswer.trim() == originalPhrase.trim()
+    private fun checkPhrase(userAnswer: String, correctPhrase: String) {
+        wordContainer.removeAllViews()
+
+        // Crear el mensaje "Respuesta correcta:" y agregarlo al contenedor
+        val correctLabel = createLabel("Respuesta correcta:")
+        wordContainer.addView(correctLabel)
+
+        val userWords = userAnswer.split(" ")
+        val correctWords = correctPhrase.split(" ")
+
+        correctWords.forEachIndexed { index, word ->
+            val button = MaterialButton(requireContext()).apply {
+                text = word
+                textSize = 18f
+                setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                setBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        if (index < userWords.size && userWords[index] == word) {
+                            android.R.color.holo_green_dark // Correcta
+                        } else {
+                            android.R.color.holo_red_dark // Incorrecta
+                        }
+                    )
+                )
+            }
+            wordContainer.addView(button)
+        }
+    }
+
+    private fun createLabel(text: String): MaterialButton {
+        return MaterialButton(requireContext()).apply {
+            this.text = text
+            textSize = 16f
+            isClickable = false // No se puede hacer clic en el texto
+            setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_blue_dark))
+            setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent))
+        }
     }
 }

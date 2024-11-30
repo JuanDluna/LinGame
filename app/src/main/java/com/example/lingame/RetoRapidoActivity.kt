@@ -19,7 +19,7 @@ class RetoRapidoActivity : FragmentActivity() {
 
     private lateinit var scoreBar: scoreBar
     private lateinit var timer: TextView
-
+    private var seconds = 60
     private lateinit var database: DatabaseReference
     private var questionsList = mutableListOf<Question>()
     private var currentQuestionIndex = 0 // Control del índice de la pregunta actual
@@ -50,7 +50,6 @@ class RetoRapidoActivity : FragmentActivity() {
         database.get().addOnSuccessListener { dataSnapshot ->
             val allQuestions = mutableListOf<Question>()
 
-            Log.i("RetoRapidoActivity", "Cantidad de preguntas cargadas: ${dataSnapshot.childrenCount}")
             dataSnapshot.children.forEach { questionSnapshot ->
                 val questionMap = questionSnapshot.child("question").value as? Map<String, String>
                 val answersMap = questionSnapshot.child("answers").value as? Map<String, List<Boolean>>
@@ -68,7 +67,6 @@ class RetoRapidoActivity : FragmentActivity() {
 
             if (allQuestions.isNotEmpty()) {
                 allQuestions.shuffle()
-                Log.i("RetoRapidoActivity", "Cantidad de preguntas mezcladas: ${allQuestions.size}")
                 questionsList.clear()
                 questionsList.addAll(allQuestions.take(10))
                 questionsList.forEach{question ->
@@ -112,14 +110,20 @@ class RetoRapidoActivity : FragmentActivity() {
     }
 
     private fun startTimer() {
-        var seconds = 0
         lifecycleScope.launch(Dispatchers.Main) {
-            while (seconds < 60) {
+            while (seconds > 0) {
                 delay(1000)
-                seconds++
+                seconds--
                 val minutes = seconds / 60
                 val remainingSeconds = seconds % 60
                 timer.text = String.format("%02d:%02d", minutes, remainingSeconds)
+            }
+            if (seconds == 0){
+                Toast.makeText(this@RetoRapidoActivity, "¡Fin del juego!", Toast.LENGTH_SHORT).show()
+                var intent = Intent()
+                intent.putExtra("win", scoreBar.isFirstStarReached())
+                setResult(RESULT_OK, intent)
+                finish()
             }
         }
     }
@@ -127,7 +131,9 @@ class RetoRapidoActivity : FragmentActivity() {
     fun onQuestionAnswered(isCorrect: Boolean) {
         if (isCorrect) {
         // Aumentar el puntaje si es correcto
-            scoreBar.incrementScore(500)
+            scoreBar.incrementScore( seconds * 10)
+        }else{
+            seconds -= 10
         }
         showNextQuestion()
     }

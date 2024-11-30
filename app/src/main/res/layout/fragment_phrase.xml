@@ -9,27 +9,35 @@
     android:background="@android:color/transparent">
 
     <!-- Contenedor para mostrar la frase ordenada -->
-    <LinearLayout
+    <com.google.android.flexbox.FlexboxLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:flexbox="http://schemas.android.com/apk/res-auto"
         android:id="@+id/answer_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="8dp"
-        android:background="@android:color/darker_gray"
-        android:layout_marginBottom="16dp" />
+        android:padding="16dp"
+        flexbox:alignContent="center"
+        flexbox:alignItems="center"
+        flexbox:flexWrap="wrap"
+        flexbox:flexDirection="row"
+        android:background="@drawable/rounded_background"/>
+
 
     <!-- Contenedor para palabras desordenadas -->
-    <LinearLayout
+    <com.google.android.flexbox.FlexboxLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:flexbox="http://schemas.android.com/apk/res-auto"
         android:id="@+id/word_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="8dp"
-        android:background="@android:color/holo_blue_light" />
+        android:padding="16dp"
+        flexbox:alignContent="center"
+        flexbox:alignItems="center"
+        flexbox:flexWrap="wrap"
+        flexbox:flexDirection="row"
+        android:background="@drawable/rounded_background"/>
 
     <!-- Botón Siguiente -->
     <com.google.android.material.button.MaterialButton

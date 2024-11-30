@@ -53,4 +53,5 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation ("com.facebook.android:facebook-android-sdk:[8,9]")
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
 }

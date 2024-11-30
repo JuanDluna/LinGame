@@ -77,6 +77,10 @@ class QuestionRRFragment : Fragment() {
             override fun newArray(size: Int): Array<Question?> = arrayOfNulls(size)
         }
 
+        fun getAnswersShuffled(): List<Answer> {
+            return answers.shuffled()
+        }
+
         // Método auxiliar para obtener la pregunta en el idioma seleccionado
         fun getQuestionInLanguage(languageCode: String): String? = question[languageCode]
     }
@@ -124,7 +128,7 @@ class QuestionRRFragment : Fragment() {
         val selectedLanguage =  sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)// Cambiar esto según la lógica de selección de idioma
         questionTextView.text = question.getQuestionInLanguage(selectedLanguage!!)
 
-        val answers = question.answers
+        val answers = question.getAnswersShuffled()
         for ((index, button) in answerButtons.withIndex()) {
             if (index < answers.size) {
                 val (answerText, isCorrect) = answers[index]

@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.animation.LinearInterpolator
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -27,7 +28,7 @@ class PlatformControl @JvmOverloads constructor(
         val platformDiameter = 150f // Diámetro de la plataforma (ajustado para que sea más pequeña)
         radius = platformDiameter / 2 // Radio para hacer la forma circular
         cardElevation = 8f // Elevación constante
-        setCardBackgroundColor(Color.parseColor("#FF6200EE")) // Color de fondo (puedes cambiarlo)
+
         isClickable = true
         isFocusable = true
 
@@ -47,7 +48,7 @@ class PlatformControl @JvmOverloads constructor(
 
     // Método para iniciar la animación de levitación con un pequeño retraso
     private fun startLevitationAnimationWithDelay() {
-        val randomDelay = (100..1000).random().toLong() // Retraso aleatorio entre 100ms y 1 segundo
+        val randomDelay = (1..1000).random().toLong() // Retraso aleatorio entre 100ms y 1 segundo
 
         // Usamos Handler para crear el retraso de la animación
         Handler(Looper.getMainLooper()).postDelayed({
@@ -115,6 +116,22 @@ class PlatformControl @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         startLevitationAnimationWithDelay() // Inicia la animación con un retraso cuando el control es agregado a la vista
+        Log.d("PlatformControl", "Category: $category")
+        when (category) {
+            "norte" -> {
+                setCardBackgroundColor(Color.RED)
+            }
+            "este" -> {
+                setCardBackgroundColor(Color.YELLOW) // Color de fondo (puedes cambiarlo)
+            }
+            "sur" -> {
+                setCardBackgroundColor(Color.GREEN) // Color de fondo (puedes cambiarlo)
+            }
+            "oeste" -> {
+                setCardBackgroundColor(Color.BLUE) // Color de fondo (puedes cambiarlo)
+            }
+
+        }
     }
 
     override fun onDetachedFromWindow() {

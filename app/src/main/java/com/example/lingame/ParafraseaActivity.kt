@@ -1,8 +1,8 @@
 package com.example.lingame
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.database.FirebaseDatabase
@@ -11,10 +11,15 @@ import com.example.lingame.PhraseFragment.Phrases
 class ParafraseaActivity : FragmentActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var phrasesList: Phrases
+    private lateinit var scoreBar: scoreBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_parafrasea)
+
+        // Inicializar vistas
+        scoreBar = findViewById(R.id.scoreBarParafrasea)
+        scoreBar.setMaxScore(5000)
 
         // Inicializar sharedPreferences
         sharedPreferences = getSharedPreferences(
@@ -54,12 +59,19 @@ class ParafraseaActivity : FragmentActivity() {
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Error al cargar frases", Toast.LENGTH_SHORT).show()
+                var intent = Intent()
+                setResult(RESULT_CANCELED, intent)
+                finish()
             }
     }
 
     private fun showPhraseFragment() {
-        if (phrasesList.isEndOfList()) {
+        if (phrasesList.isEndOfList() && !phrasesList.isEmpty()) {
             Toast.makeText(this, "¡Juego terminado!", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Puntaje final: ${scoreBar.getScore()}", Toast.LENGTH_LONG).show()
+            var intent = Intent()
+            intent.putExtra("win", scoreBar.isFirstStarReached())
+            setResult(RESULT_OK, intent)
             finish()
         } else {
             val nextPhrase = phrasesList.nextPhrase()
@@ -72,7 +84,7 @@ class ParafraseaActivity : FragmentActivity() {
 
     fun onPhraseCompleted(isCorrect: Boolean) {
         if (isCorrect) {
-            // Aumentar el puntaje
+            scoreBar.incrementScore( phrasesList.getActualPhrase().length * 50)
             Toast.makeText(this, "Respuesta correcta", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(this, "Respuesta incorrecta", Toast.LENGTH_SHORT).show()
