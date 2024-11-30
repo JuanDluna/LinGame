@@ -64,6 +64,7 @@ class GameActivity : Fragment() {
         constraintSet.connect(westPlatform.id, ConstraintSet.TOP, centralPlatformId, ConstraintSet.TOP)
         constraintSet.connect(westPlatform.id, ConstraintSet.BOTTOM, centralPlatformId, ConstraintSet.BOTTOM)
 
+
         // Aplicar las restricciones
         constraintSet.applyTo(constraintLayout)
     }

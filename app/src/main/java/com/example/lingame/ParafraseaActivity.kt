@@ -6,10 +6,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.database.FirebaseDatabase
+import com.example.lingame.PhraseFragment.Word
+import com.example.lingame.PhraseFragment.Phrases
 
 class ParafraseaActivity : FragmentActivity() {
     private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var wordList: List<Word>  // Usaremos una lista de la nueva data class
+    private lateinit var phrasesList: Phrases
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,18 +36,20 @@ class ParafraseaActivity : FragmentActivity() {
         database.child("languages/phrases")
             .get()
             .addOnSuccessListener { dataSnapshot ->
-                val phrasesList = dataSnapshot.value
+                val phrasesListDB = dataSnapshot.value
 
-                if (phrasesList is ArrayList<*>) {
+                if (phrasesListDB is ArrayList<*>) {
                     val phrases = mutableListOf<String>()
-                    phrasesList.forEach { phrase ->
+                    phrasesListDB.forEach { phrase ->
                         if (phrase is HashMap<*, *>) {
                             phrases.add((phrase[language] ?: "").toString())
                         }
                     }
                     phrases.shuffle()
-                    wordList = phrases.take(5).map { Word(it, it) }  // Usamos la data class aquí
-                    Log.d("ParafraseaActivity", "Frases cargadas: ${wordList.joinToString()}")
+
+                    phrasesList = Phrases( phrases.take(5))
+
+                    Log.d("ParafraseaActivity", "Frases cargadas: ${phrasesList.getPhrases()}")
                     showPhraseFragment()
                 }
             }
@@ -55,7 +59,7 @@ class ParafraseaActivity : FragmentActivity() {
     }
 
     private fun showPhraseFragment() {
-        val fragment = PhraseFragment.newInstance(wordList)
+        val fragment = PhraseFragment.newInstance(phrasesList.nextPhrase())
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .commit()

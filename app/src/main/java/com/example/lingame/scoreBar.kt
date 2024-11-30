@@ -113,4 +113,8 @@ class scoreBar @JvmOverloads constructor(
         progress += increment
         invalidate()
     }
+
+    fun getScore(): Int {
+        return progress
+    }
 }

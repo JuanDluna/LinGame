@@ -10,10 +10,33 @@ import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 
-data class Word(val original: String, val shuffled: String)  // Data class para la palabra
 
 class PhraseFragment : Fragment() {
-    private lateinit var wordList: List<Word>  // Lista de palabras mezcladas
+
+    data class Word(val original: String, val shuffled: String)  // Data class para la palabra
+    data class Phrases(val phrases: List<String>){
+        private val phrasesList = phrases
+        private var index = 0
+        fun getPhrases(): List<String> {
+            return phrasesList
+        }
+        fun shufflePhrases(): List<String> {
+            return phrasesList.shuffled()
+        }
+
+        fun nextPhrase(): String {
+            index++
+            return phrasesList.
+        }
+
+        fun isEndOfList(): Boolean {
+            return index >= phrasesList.size - 1
+        }
+
+    }
+
+    private var wordsOfPhrase = MutableList<String>()   // Lista de palabras mezcladas
+
     private var currentIndex = 0  // Índice para el seguimiento de la frase actual
 
     companion object {

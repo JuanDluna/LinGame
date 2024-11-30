@@ -108,6 +108,10 @@ class PlatformControl @JvmOverloads constructor(
         }
     }
 
+    private fun startForResult(intent: Intent) {
+
+    }
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         startLevitationAnimationWithDelay() // Inicia la animación con un retraso cuando el control es agregado a la vista
@@ -117,4 +121,5 @@ class PlatformControl @JvmOverloads constructor(
         super.onDetachedFromWindow()
         stopLevitationAnimation() // Detiene la animación si el control es removido
     }
+
 }

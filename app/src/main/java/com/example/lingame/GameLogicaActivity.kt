@@ -160,7 +160,8 @@ class GameLogicaActivity : FragmentActivity() {
         Log.i("GameLogicaActivity", "Idiomas seleccionados: ${listOfLanguages}")
         var DropdownOptions = mutableMapOf<String, Drawable>()
 
-        if (selectedLanguage == null){
+        if ( selectedLanguage == null || selectedLanguage = "es" || selectedLanguage.isEmpty() ){
+
             selectedLanguage = listOfLanguages!!.take(1).toString()
             listOfLanguages.remove(selectedLanguage)
             preferences.edit().putStringSet(getString(R.string.listOfLanguagesPreferences), listOfLanguages).apply()
@@ -171,12 +172,9 @@ class GameLogicaActivity : FragmentActivity() {
                 "Portugués" -> selectedLanguage = getString(R.string.portugueseValuePreferences)
             }
             preferences.edit().putString(getString(R.string.selectedLanguagePreferences), selectedLanguage).apply()
+            setDrawableOfSelector()
         }
-        when(selectedLanguage){
-            getString(R.string.portugueseValuePreferences) -> languageSelector.setImageDrawable(getDrawable(R.drawable.banderabrasil))
-            getString(R.string.englishValuePreferences) -> languageSelector.setImageDrawable(getDrawable(R.drawable.banderausa))
-            getString(R.string.frenchValuePreferences) -> languageSelector.setImageDrawable(getDrawable(R.drawable.banderafrancia))
-        }
+
 
         listOfLanguages!!.forEach { language ->
             when(language){
