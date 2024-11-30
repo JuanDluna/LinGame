@@ -160,23 +160,32 @@ class GameLogicaActivity : FragmentActivity() {
         Log.i("GameLogicaActivity", "Idiomas seleccionados: ${listOfLanguages}")
         var DropdownOptions = mutableMapOf<String, Drawable>()
 
-        if ( selectedLanguage == null || selectedLanguage = "es" || selectedLanguage.isEmpty() ){
-
-            selectedLanguage = listOfLanguages!!.take(1).toString()
-            listOfLanguages.remove(selectedLanguage)
+        if (selectedLanguage == null || selectedLanguage == "es" || selectedLanguage.isEmpty()) {
+            // Obtener el primer idioma disponible de la lista
+            selectedLanguage = listOfLanguages!!.firstOrNull() // Por si la lista está vacía
             preferences.edit().putStringSet(getString(R.string.listOfLanguagesPreferences), listOfLanguages).apply()
 
-            when(selectedLanguage){
-                "Inglés" -> selectedLanguage = getString(R.string.englishValuePreferences)
-                "Francés" -> selectedLanguage = getString(R.string.frenchValuePreferences)
-                "Portugués" -> selectedLanguage = getString(R.string.portugueseValuePreferences)
+            // Mapear los nombres de idiomas a sus valores correspondientes
+            selectedLanguage = when (selectedLanguage) {
+                "Inglés" -> getString(R.string.englishValuePreferences)
+                "Francés" -> getString(R.string.frenchValuePreferences)
+                "Portugués" -> getString(R.string.portugueseValuePreferences)
+                else -> selectedLanguage // En caso de que no coincida, dejar el valor actual
             }
+
+            // Guardar el idioma seleccionado en las preferencias
             preferences.edit().putString(getString(R.string.selectedLanguagePreferences), selectedLanguage).apply()
+
+            // Actualizar el selector visual
             setDrawableOfSelector()
         }
 
 
+
         listOfLanguages!!.forEach { language ->
+            if (language == selectedLanguage){
+                return
+            }
             when(language){
                 "Portugués" -> DropdownOptions.put("Portugués", getDrawable(R.drawable.banderabrasil)!!)
                 "Inglés" -> DropdownOptions.put("Inglés", getDrawable(R.drawable.banderausa)!!)

@@ -6,7 +6,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.database.FirebaseDatabase
-import com.example.lingame.PhraseFragment.Word
 import com.example.lingame.PhraseFragment.Phrases
 
 class ParafraseaActivity : FragmentActivity() {
@@ -20,12 +19,14 @@ class ParafraseaActivity : FragmentActivity() {
         // Inicializar sharedPreferences
         sharedPreferences = getSharedPreferences(
             getString(R.string.sharedPreferencesName),
-            MODE_PRIVATE)
+            MODE_PRIVATE
+        )
 
         // Obtener idioma seleccionado
         val selectedLanguage = sharedPreferences.getString(
             getString(R.string.selectedLanguagePreferences),
-            null)
+            null
+        )
 
         // Obtener frases de Firebase y configurar el juego
         fetchPhrasesFromDatabase(selectedLanguage!!)
@@ -45,11 +46,9 @@ class ParafraseaActivity : FragmentActivity() {
                             phrases.add((phrase[language] ?: "").toString())
                         }
                     }
-                    phrases.shuffle()
 
-                    phrasesList = Phrases( phrases.take(5))
+                    phrasesList = Phrases(phrases.shuffled().take(5))
 
-                    Log.d("ParafraseaActivity", "Frases cargadas: ${phrasesList.getPhrases()}")
                     showPhraseFragment()
                 }
             }
@@ -59,10 +58,16 @@ class ParafraseaActivity : FragmentActivity() {
     }
 
     private fun showPhraseFragment() {
-        val fragment = PhraseFragment.newInstance(phrasesList.nextPhrase())
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
+        if (phrasesList.isEndOfList()) {
+            Toast.makeText(this, "¡Juego terminado!", Toast.LENGTH_LONG).show()
+            finish()
+        } else {
+            val nextPhrase = phrasesList.nextPhrase()
+            val fragment = PhraseFragment.newInstance(nextPhrase)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commit()
+        }
     }
 
     fun onPhraseCompleted(isCorrect: Boolean) {
@@ -73,12 +78,7 @@ class ParafraseaActivity : FragmentActivity() {
             Toast.makeText(this, "Respuesta incorrecta", Toast.LENGTH_SHORT).show()
         }
 
-        // Pasar a la siguiente frase o terminar el juego
-        if (wordList.isEmpty()) {
-            Toast.makeText(this, "¡Juego terminado!", Toast.LENGTH_LONG).show()
-            finish()
-        } else {
-            showPhraseFragment()
-        }
+        // Mostrar la siguiente frase
+        showPhraseFragment()
     }
 }

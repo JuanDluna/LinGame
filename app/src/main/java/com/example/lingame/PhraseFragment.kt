@@ -6,27 +6,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
-
 
 class PhraseFragment : Fragment() {
 
-    data class Word(val original: String, val shuffled: String)  // Data class para la palabra
     data class Phrases(val phrases: List<String>){
         private val phrasesList = phrases
         private var index = 0
-        fun getPhrases(): List<String> {
-            return phrasesList
-        }
+
         fun shufflePhrases(): List<String> {
             return phrasesList.shuffled()
         }
 
         fun nextPhrase(): String {
             index++
-            return phrasesList.
+            return phrasesList.get(index)
         }
 
         fun isEndOfList(): Boolean {
@@ -35,15 +31,13 @@ class PhraseFragment : Fragment() {
 
     }
 
-    private var wordsOfPhrase = MutableList<String>()   // Lista de palabras mezcladas
-
-    private var currentIndex = 0  // Índice para el seguimiento de la frase actual
-
     companion object {
         // Pasamos las palabras desde la actividad a este fragmento
-        fun newInstance(wordList: List<Word>): PhraseFragment {
+        fun newInstance(phrase: String): PhraseFragment {
             return PhraseFragment().apply {
-                this.wordList = wordList
+                arguments = Bundle().apply {
+                    putString("phrase", phrase)
+                }
             }
         }
     }
@@ -51,6 +45,7 @@ class PhraseFragment : Fragment() {
     private lateinit var wordContainer: LinearLayout
     private lateinit var answerContainer: LinearLayout
     private val selectedWords = mutableListOf<String>()
+    private var wordsOfPhrase = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,14 +57,17 @@ class PhraseFragment : Fragment() {
         wordContainer = rootView.findViewById(R.id.word_container)
         answerContainer = rootView.findViewById(R.id.answer_container)
 
-        // Obtener palabras mezcladas
-        val shuffledWords = wordList[currentIndex].shuffled.split(" ")
-        if (shuffledWords.isEmpty()) {
+        // Obtener la frase y dividirla en palabras mezcladas
+        val phrase = arguments?.getString("phrase") ?: ""
+        wordsOfPhrase = phrase.split(" ").toMutableList()
+        wordsOfPhrase.shuffle()
+
+        if (wordsOfPhrase.isEmpty()) {
             Toast.makeText(requireContext(), "No hay palabras para mostrar", Toast.LENGTH_SHORT).show()
             return rootView
         }
 
-        configureShuffledWords(shuffledWords)
+        configureShuffledWords(wordsOfPhrase)
         rootView.findViewById<View>(R.id.next_button).setOnClickListener { onNextButtonClicked() }
 
         return rootView
@@ -111,15 +109,7 @@ class PhraseFragment : Fragment() {
     }
 
     private fun isCorrectAnswer(userAnswer: String): Boolean {
-        return userAnswer.trim() == wordList[currentIndex].original
-    }
-
-    private fun moveToNextPhrase(): Boolean {
-        return if (currentIndex < wordList.size - 1) {
-            currentIndex++
-            true
-        } else {
-            false
-        }
+        val originalPhrase = arguments?.getString("phrase") ?: ""
+        return userAnswer.trim() == originalPhrase.trim()
     }
 }

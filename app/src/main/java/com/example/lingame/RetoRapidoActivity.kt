@@ -28,8 +28,6 @@ class RetoRapidoActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reto_rapido)
 
-        // Inicializar SharedPreferences
-
         // Inicializar Firebase Database
         database = FirebaseDatabase.getInstance().reference.child("languages").child("reto_rapido")
 
@@ -79,13 +77,22 @@ class RetoRapidoActivity : FragmentActivity() {
                 showNextQuestion()
             } else {
                 Toast.makeText(this, "No se encontraron preguntas", Toast.LENGTH_SHORT).show()
+                var intent = Intent()
+                setResult(RESULT_CANCELED, intent)
+                finish()
             }
         }.addOnFailureListener { exception ->
             Toast.makeText(this, "Error al cargar las preguntas: ${exception.message}", Toast.LENGTH_SHORT).show()
+            var intent = Intent()
+            setResult(RESULT_CANCELED, intent)
+            finish()
         }
     }
 
     fun showNextQuestion() {
+        if( questionsList ==  null || questionsList.isEmpty()){
+            return
+        }
         if (currentQuestionIndex < questionsList.size) {
             val currentQuestion = questionsList[currentQuestionIndex]
             val fragment = QuestionRRFragment.newInstance(currentQuestion)
@@ -95,7 +102,7 @@ class RetoRapidoActivity : FragmentActivity() {
                 .commit()
 
             currentQuestionIndex++
-        } else {
+        } else if (currentQuestionIndex == questionsList.size  ) {
             Toast.makeText(this, "¡Fin del juego!", Toast.LENGTH_SHORT).show()
             var intent = Intent()
             intent.putExtra("score", scoreBar.getScore())
