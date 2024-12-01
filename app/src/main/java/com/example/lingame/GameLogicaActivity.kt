@@ -212,8 +212,6 @@ class GameLogicaActivity : FragmentActivity() {
         var DropdownOptions = mutableMapOf<String, Drawable>()
 
         listOfLanguages!!.forEach { language ->
-            Log.i("GameLogicaActivity", "Idioma: ${language}")
-            Log.i("GameLogicaActivity", "Idioma seleccionado: ${selectedLanguage}")
 
             when(language){
                 "Portugués" ->{

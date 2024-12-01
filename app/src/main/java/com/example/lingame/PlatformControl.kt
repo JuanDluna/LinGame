@@ -102,6 +102,11 @@ class PlatformControl @JvmOverloads constructor(
                     val intent = Intent(context, ParafraseaActivity::class.java)
                     context.startActivity(intent)
                 }
+                "sur" -> {
+                    val intent = Intent(context, TraduceloActivity::class.java)
+                    context.startActivity(intent)
+                }
+
                 else -> {
                     // Manejo de categorías no asignadas
                 }
