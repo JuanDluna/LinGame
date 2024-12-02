@@ -1,36 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/tutorialLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Plataforma inicial -->
     <com.example.lingame.PlatformControl
         android:id="@+id/platformControl"
-        android:layout_width="91dp"
-        android:layout_height="52dp"
+        android:layout_width="89dp"
+        android:layout_height="64dp"
         android:layout_marginTop="308dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:targetActivity="com.example.lingame.LoginActivity" />
+        app:targetActivity="com.example.lingame.GameLogicaActivity" />
 
+    <!-- Texto de la guía -->
     <Button
         android:id="@+id/guideText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="164dp"
-        android:text="¡Hola! soy Lingo, hoy seré tú guía."
+        android:text="¡Hola! soy Lingo, hoy seré tu guía."
         android:textSize="18sp"
         android:background="@android:color/transparent"
         android:textColor="?attr/textAppearanceBody1"
-        android:padding="0dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Texto para continuar -->
     <TextView
         android:id="@+id/continueText"
         android:layout_width="wrap_content"
@@ -42,4 +43,40 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp" />
 
+    <!-- Plataformas del tutorial -->
+    <com.example.lingame.PlatformControl
+        android:id="@+id/platform1"
+        android:layout_width="89dp"
+        android:layout_height="64dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/platformControl"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.example.lingame.PlatformControl
+        android:id="@+id/platform2"
+        android:layout_width="89dp"
+        android:layout_height="64dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/platform1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.example.lingame.PlatformControl
+        android:id="@+id/platform3"
+        android:layout_width="89dp"
+        android:layout_height="64dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/platform2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.example.lingame.PlatformControl
+        android:id="@+id/platform4"
+        android:layout_width="89dp"
+        android:layout_height="64dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/platform3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

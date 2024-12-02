@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
 import android.view.animation.LinearInterpolator
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -20,6 +19,7 @@ class PlatformControl @JvmOverloads constructor(
     var category: String? = null // Atributo para la categoría (norte, sur, este, oeste)
     var targetActivity: Class<out FragmentActivity>? = null // Atributo para targetActivity
     var targetFragment: Class<out Fragment>? = null // Atributo para targetFragment
+    var levelPassed: Boolean = false
 
     private var animator: ValueAnimator? = null
 
@@ -28,7 +28,7 @@ class PlatformControl @JvmOverloads constructor(
         val platformDiameter = 150f // Diámetro de la plataforma (ajustado para que sea más pequeña)
         radius = platformDiameter / 2 // Radio para hacer la forma circular
         cardElevation = 8f // Elevación constante
-
+        setCardBackgroundColor(Color.parseColor("#FF6200EE")) // Color de fondo (puedes cambiarlo)
         isClickable = true
         isFocusable = true
 
@@ -47,8 +47,8 @@ class PlatformControl @JvmOverloads constructor(
     }
 
     // Método para iniciar la animación de levitación con un pequeño retraso
-    private fun startLevitationAnimationWithDelay() {
-        val randomDelay = (1..1000).random().toLong() // Retraso aleatorio entre 100ms y 1 segundo
+    fun startLevitationAnimationWithDelay() {
+        val randomDelay = (100..1000).random().toLong() // Retraso aleatorio entre 100ms y 1 segundo
 
         // Usamos Handler para crear el retraso de la animación
         Handler(Looper.getMainLooper()).postDelayed({
@@ -102,11 +102,6 @@ class PlatformControl @JvmOverloads constructor(
                     val intent = Intent(context, ParafraseaActivity::class.java)
                     context.startActivity(intent)
                 }
-                "sur" -> {
-                    val intent = Intent(context, TraduceloActivity::class.java)
-                    context.startActivity(intent)
-                }
-
                 else -> {
                     // Manejo de categorías no asignadas
                 }
@@ -121,22 +116,6 @@ class PlatformControl @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         startLevitationAnimationWithDelay() // Inicia la animación con un retraso cuando el control es agregado a la vista
-        Log.d("PlatformControl", "Category: $category")
-        when (category) {
-            "norte" -> {
-                setCardBackgroundColor(context.getColor(R.color.retorapido))
-            }
-            "este" -> {
-                setCardBackgroundColor(context.getColor(R.color.parafrasea)) // Color de fondo (puedes cambiarlo)
-            }
-            "sur" -> {
-                setCardBackgroundColor(context.getColor(R.color.traducelo)) // Color de fondo (puedes cambiarlo)
-            }
-            "oeste" -> {
-                setCardBackgroundColor(context.getColor(R.color.createStory)) // Color de fondo (puedes cambiarlo)
-            }
-
-        }
     }
 
     override fun onDetachedFromWindow() {
