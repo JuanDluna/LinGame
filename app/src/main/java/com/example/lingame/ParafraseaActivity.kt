@@ -12,10 +12,14 @@ class ParafraseaActivity : FragmentActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var phrasesList: Phrases
     private lateinit var scoreBar: scoreBar
+    private lateinit var dbHelper : DBSQLite
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_parafrasea)
+
+        //Inicializar la base de datos
+        dbHelper = DBSQLite(this)
 
         // Inicializar vistas
         scoreBar = findViewById(R.id.scoreBarParafrasea)
@@ -28,10 +32,17 @@ class ParafraseaActivity : FragmentActivity() {
         )
 
         // Obtener idioma seleccionado
-        val selectedLanguage = sharedPreferences.getString(
+        var selectedLanguage = sharedPreferences.getString(
             getString(R.string.selectedLanguagePreferences),
             null
         )
+
+        selectedLanguage = when (selectedLanguage) {
+            getString(R.string.englishValuePreferences) -> "en"
+            getString(R.string.frenchValuePreferences) -> "fr"
+            getString(R.string.portugueseValuePreferences) -> "pr"
+            else -> "es"
+        }
 
         // Obtener frases de Firebase y configurar el juego
         fetchPhrasesFromDatabase(selectedLanguage!!)
@@ -67,11 +78,18 @@ class ParafraseaActivity : FragmentActivity() {
 
     private fun showPhraseFragment() {
         if (phrasesList.isEndOfList() && !phrasesList.isEmpty()) {
-            Toast.makeText(this, "¡Juego terminado!", Toast.LENGTH_LONG).show()
-            Toast.makeText(this, "Puntaje final: ${scoreBar.getScore()}", Toast.LENGTH_LONG).show()
+            val UID = sharedPreferences.getString(getString(R.string.UID_Preferences), null)
+            val actualLanguage = sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)
+            val actualCategory = getString(R.string.parafrasea)
+            val increment = scoreBar.getScore() / 10000F
+
+            // Actualizar la base de datos
+            dbHelper.updateLevelsByCategory(UID!!, actualLanguage!!, actualCategory, increment);
+
             var intent = Intent()
             intent.putExtra("win", scoreBar.isFirstStarReached())
             setResult(RESULT_OK, intent)
+            GameLogicaActivity().initHudElements()
             finish()
         } else {
             val nextPhrase = phrasesList.nextPhrase()

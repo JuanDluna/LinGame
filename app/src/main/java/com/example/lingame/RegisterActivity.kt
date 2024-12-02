@@ -151,6 +151,8 @@ class RegisterActivity : AppCompatActivity() {
                         Log.i("RegisterActivity", "Using default avatar")
                         val defaultDrawable = resources.getDrawable(R.drawable.avatar_base_png, null)
                         bitmapPhoto = (defaultDrawable as BitmapDrawable).bitmap
+                        bitmapPhoto = getRoundedBitmap(bitmapPhoto!!)
+                        bitmapPhoto = Bitmap.createScaledBitmap(bitmapPhoto!!, 200, 200, false)
                     }
                     val filePath = saveImageToLocalStorage(bitmapPhoto)
                     Log.d("RegisterActivity", "File path: $filePath")

@@ -1,6 +1,7 @@
 package com.example.lingame
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -15,9 +16,19 @@ class TraduceloActivity : AppCompatActivity() {
     private val allWords = mutableListOf<Map<String, String>>()
     private var currentWordIndex = 0
 
+    private lateinit var dbHelper : DBSQLite
+    private lateinit var sharedPreferences: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_traducelo)
+
+        // Inicializar base de datos
+        dbHelper = DBSQLite(this)
+        sharedPreferences = getSharedPreferences(
+            getString(R.string.sharedPreferencesName),
+            MODE_PRIVATE
+        )
 
         // Asegúrate de que `score_bar` exista en tu layout
         scoreBar = findViewById(R.id.score_bar)
@@ -70,7 +81,14 @@ class TraduceloActivity : AppCompatActivity() {
 
     private fun getLearningLanguage(): String {
         val preferences = getSharedPreferences(getString(R.string.sharedPreferencesName), MODE_PRIVATE)
-        return preferences.getString(getString(R.string.selectedLanguagePreferences), null ) ?: "es"
+        var selectedLanguage =  preferences.getString(getString(R.string.selectedLanguagePreferences), null)// Cambiar esto según la lógica de selección de idioma
+
+        return when (selectedLanguage) {
+            getString(R.string.englishValuePreferences) -> "en"
+            getString(R.string.frenchValuePreferences) -> "fr"
+            getString(R.string.portugueseValuePreferences) -> "pr"
+            else -> "es"
+        }
     }
 
     private fun loadNextFragment() {
@@ -105,10 +123,20 @@ class TraduceloActivity : AppCompatActivity() {
     }
 
     private fun showGameEnd() {
+        val UID = sharedPreferences.getString(getString(R.string.UID_Preferences), null)
+        val actualLanguage = sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)
+        val actualCategory = getString(R.string.traducelo)
+        val increment = scoreBar.getScore() / 10000F
+
+        // Actualizar la base de datos
+        dbHelper.updateLevelsByCategory(UID!!, actualLanguage!!, actualCategory, increment);
+
         val intent = Intent().apply {
             putExtra("win", scoreBar.isFirstStarReached())
         }
         setResult(RESULT_OK, intent)
+        GameLogicaActivity().initHudElements()
+
         finish()
     }
 

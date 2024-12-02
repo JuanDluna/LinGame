@@ -3,28 +3,17 @@ package com.example.lingame
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.Picture
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.SurfaceView
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firestore.v1.Cursor
 import java.io.File
-import java.net.URI
-import kotlin.math.exp
 import kotlin.math.roundToInt
 
 class GameLogicaActivity : FragmentActivity() {
@@ -68,7 +57,7 @@ class GameLogicaActivity : FragmentActivity() {
     /**
      * Inicializa las vistas del HUD.
      */
-    private fun initHudElements() {
+    fun initHudElements() {
         playerAvatar = findViewById(R.id.playerAvatar)
         playerLevel = findViewById(R.id.playerLevel)
         experienceBar = findViewById(R.id.experienceBar)
@@ -92,8 +81,8 @@ class GameLogicaActivity : FragmentActivity() {
             var playerPhotoURI: String? = null
 
             try {
-                level = cursorDb.getFloat(cursorDb.getColumnIndexOrThrow("generalLevel"))
-                playerPhotoURI = cursorDb.getString(cursorDb.getColumnIndexOrThrow("photo_url"))
+                level = cursorDb.getFloat(cursorDb.getColumnIndexOrThrow(DBSQLite.COLUMN_GENERAL_LEVEL))
+                playerPhotoURI = cursorDb.getString(cursorDb.getColumnIndexOrThrow(DBSQLite.COLUMN_PHOTO_URL))
             } catch (e: Exception) {
                 Log.d("GameLogicaActivity", "Error al obtener datos del usuario: ${e.message}")
             }
@@ -108,7 +97,6 @@ class GameLogicaActivity : FragmentActivity() {
                     try {
                         val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
                         playerAvatar.setImageBitmap(bitmap)
-                        playerAvatar.setBackgroundColor(Color.WHITE)
                         Log.d("GameLogicaActivity", "Imagen cargada correctamente en el avatar.")
                     } catch (e: Exception) {
                         Log.e("GameLogicaActivity", "Error al cargar la imagen: ${e.message}")
@@ -122,11 +110,15 @@ class GameLogicaActivity : FragmentActivity() {
 
             // Configuración de nivel y barra de experiencia
             playerLevel.text = "Nivel: ${level?.roundToInt() ?: "Desconocido"}"
-            experienceBar.progress = ((level ?: 0f - (level ?: 0f).toInt()) * 100).toInt()
+            experienceBar.progress = ((level!! % 1) * 100).toInt()
         } else {
             Log.d("GameLogicaActivity", "Cursor nulo o vacío")
         }
 
+
+        playerAvatar.setOnClickListener {
+            PlayerInfoDialogFragment().show(supportFragmentManager, "PlayerInfoDialogFragment")
+        }
 
     }
 
@@ -137,13 +129,13 @@ class GameLogicaActivity : FragmentActivity() {
 
         menuButton.setDropdownOptions(
             mapOf(
-                "Opciones" to getDrawable(R.drawable.baseline_settings_24)!!,
+                "Informacion" to getDrawable(R.drawable.info_64)!!,
                 "Ajustes" to getDrawable(R.drawable.baseline_settings_24)!!,
-                "Salir" to getDrawable(R.drawable.baseline_settings_24)!!)
+                "Salir" to getDrawable(R.drawable.exit_24)!!)
             )
         menuButton.setOnOptionClickListener { option ->
             when (option) {
-                "Opciones" -> showOptionsDialog()
+                "Informacion" -> showOptionsDialog()
                 "Ajustes" -> showSettingsDialog()
                 "Salir" -> exitGame()
                 else -> Toast.makeText(this, "Opción no reconocida", Toast.LENGTH_SHORT).show()
@@ -154,32 +146,25 @@ class GameLogicaActivity : FragmentActivity() {
     /**
      * Configura el selector de idioma.
      */
-    private fun setupLanguageSelector() {
+     fun setupLanguageSelector() {
         var listOfLanguages = preferences.getStringSet(getString(R.string.listOfLanguagesPreferences), null)
         var selectedLanguage = preferences.getString(getString(R.string.selectedLanguagePreferences), null)
         Log.i("GameLogicaActivity", "Idiomas seleccionados: ${listOfLanguages}")
 
-        if (selectedLanguage == null || selectedLanguage == "es" || selectedLanguage.isEmpty()) {
+        if (selectedLanguage == null || selectedLanguage.isEmpty()) {
             // Obtener el primer idioma disponible de la lista
             selectedLanguage = listOfLanguages!!.firstOrNull() // Por si la lista está vacía
+            listOfLanguages.remove(selectedLanguage)
+
+            // Guardar los datos obtenidos
             preferences.edit().putStringSet(getString(R.string.listOfLanguagesPreferences), listOfLanguages).apply()
-
-            // Mapear los nombres de idiomas a sus valores correspondientes
-            selectedLanguage = when (selectedLanguage) {
-                "Inglés" -> getString(R.string.englishValuePreferences)
-                "Francés" -> getString(R.string.frenchValuePreferences)
-                "Portugués" -> getString(R.string.portugueseValuePreferences)
-                else -> selectedLanguage // En caso de que no coincida, dejar el valor actual
-            }
-
-            // Guardar el idioma seleccionado en las preferencias
             preferences.edit().putString(getString(R.string.selectedLanguagePreferences), selectedLanguage).apply()
 
             // Actualizar el selector visual
             setDrawableOfSelector()
-        }else{
-            setDrawableOfSelector()
-        }
+        }else if(listOfLanguages!!.contains(selectedLanguage)) listOfLanguages.remove(selectedLanguage)
+
+        setDrawableOfSelector()
 
         setDropdownOptions( listOfLanguages, selectedLanguage)
 
@@ -187,9 +172,9 @@ class GameLogicaActivity : FragmentActivity() {
 
         languageSelector.setOnOptionClickListener { language ->
             when (language) {
-                "Portugués" -> changeLanguage(getString(R.string.portugueseValuePreferences))
-                "Inglés" -> changeLanguage(getString(R.string.englishValuePreferences))
-                "Francés" -> changeLanguage(getString(R.string.frenchValuePreferences))
+                getString(R.string.portugueseValuePreferences) -> changeLanguage(getString(R.string.portugueseValuePreferences))
+                getString(R.string.englishValuePreferences) -> changeLanguage(getString(R.string.englishValuePreferences))
+                getString(R.string.frenchValuePreferences) -> changeLanguage(getString(R.string.frenchValuePreferences))
                 else -> Toast.makeText(this, "Idioma no reconocido", Toast.LENGTH_SHORT).show()
             }
         }
@@ -203,7 +188,18 @@ class GameLogicaActivity : FragmentActivity() {
      * Lógica para cambiar el idioma.
      */
     private fun changeLanguage(languageCode: String) {
-        preferences.edit().putString(getString(R.string.selectedLanguagePreferences), languageCode).apply()
+        var edit = preferences.edit()
+
+        // Logica para manejar los idiomas que estan en lista y el seleccionado
+        var listLanguages = preferences.getStringSet(getString(R.string.listOfLanguagesPreferences), null)
+        var selectedLanguage = preferences.getString(getString(R.string.selectedLanguagePreferences), null)
+
+        listLanguages!!.add(selectedLanguage)
+        listLanguages!!.remove(languageCode)
+        edit.putStringSet(getString(R.string.listOfLanguagesPreferences), listLanguages)
+        edit.putString(getString(R.string.selectedLanguagePreferences), languageCode)
+        edit.apply()
+
         setDrawableOfSelector();
         setDropdownOptions( listOfLanguages = preferences.getStringSet(getString(R.string.listOfLanguagesPreferences), null), selectedLanguage = languageCode )
     }
@@ -214,20 +210,14 @@ class GameLogicaActivity : FragmentActivity() {
         listOfLanguages!!.forEach { language ->
 
             when(language){
-                "Portugués" ->{
-                    if (selectedLanguage != "pr"){
-                        DropdownOptions.put("Portugués", getDrawable(R.drawable.banderabrasil)!!)
-                    }
+                getString(R.string.portugueseValuePreferences) ->{
+                        DropdownOptions.put(getString(R.string.portugueseValuePreferences), getDrawable(R.drawable.banderabrasil)!!)
                 }
-                "Inglés" ->{
-                    if (selectedLanguage != "en"){
-                        DropdownOptions.put("Inglés", getDrawable(R.drawable.banderausa)!!)
-                    }
+                getString(R.string.englishValuePreferences) ->{
+                        DropdownOptions.put(getString(R.string.englishValuePreferences), getDrawable(R.drawable.banderausa)!!)
                 }
-                "Francés" ->{
-                    if (selectedLanguage != "fr"){
-                        DropdownOptions.put("Francés", getDrawable(R.drawable.banderafrancia)!!)
-                    }
+                getString(R.string.frenchValuePreferences) ->{
+                        DropdownOptions.put(getString(R.string.frenchValuePreferences), getDrawable(R.drawable.banderafrancia)!!)
                 }
             }
         }
@@ -250,16 +240,14 @@ class GameLogicaActivity : FragmentActivity() {
      * Muestra un diálogo de opciones.
      */
     private fun showOptionsDialog() {
-        Toast.makeText(this, "Opciones abiertas", Toast.LENGTH_SHORT).show()
-        // Implementar lógica para mostrar opciones personalizadas
+        CategoryInfoDialog().show(supportFragmentManager, "CategoryInfoDialog")
     }
 
     /**
      * Muestra un diálogo de configuración.
      */
     private fun showSettingsDialog() {
-        Toast.makeText(this, "Ajustes abiertos", Toast.LENGTH_SHORT).show()
-        // Implementar lógica para ajustes personalizados
+        SettingsDialogFragment().show(supportFragmentManager, "SettingsDialogFragment")
     }
 
     /**

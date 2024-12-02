@@ -1,0 +1,180 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_background"
+    android:backgroundTint="?attr/colorPrimary">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Sección de Tema -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tema de la aplicación"
+            android:textStyle="bold"
+            android:paddingBottom="8dp"
+            android:layout_gravity="center"
+            android:textColor="@color/generalWhite"
+            android:fontFamily="@font/howdy_lemon"/>
+
+        <RadioGroup
+            android:id="@+id/rgTheme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rbThemeSystem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sistema"
+                android:textColor="@color/generalWhite"
+                android:fontFamily="@font/howdy_lemon"/>
+
+            <RadioButton
+                android:id="@+id/rbThemeLight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Claro"
+                android:textColor="@color/generalWhite"
+                android:fontFamily="@font/howdy_lemon"/>
+
+            <RadioButton
+                android:id="@+id/rbThemeDark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Oscuro"
+                android:textColor="@color/generalWhite"
+                android:fontFamily="@font/howdy_lemon"/>
+        </RadioGroup>
+
+        <!-- Sección de Vibración y Audio -->
+        <Switch
+            android:id="@+id/switchVibration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Habilitar vibración"
+            android:textColor="@color/generalWhite"
+            android:fontFamily="@font/howdy_lemon" />
+
+        <Switch
+            android:id="@+id/switchAudio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Habilitar audio"
+            android:textColor="@color/generalWhite"
+            android:fontFamily="@font/howdy_lemon"/>
+
+        <!-- Selección de idiomas -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Selecciona los idiomas que quieres aprender"
+            android:textStyle="bold"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp"
+            android:textColor="@color/generalWhite"
+            android:fontFamily="@font/howdy_lemon"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <!-- USA -->
+            <LinearLayout
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:src="@drawable/banderausa"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp" />
+
+                <CheckBox
+                    android:id="@+id/cbUSA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="USA"
+                    android:textColor="@color/generalWhite"
+                    android:fontFamily="@font/howdy_lemon"/>
+            </LinearLayout>
+
+            <!-- Francia -->
+            <LinearLayout
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:src="@drawable/banderafrancia"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp" />
+
+                <CheckBox
+                    android:id="@+id/cbFrance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Francia"
+                    android:textColor="@color/generalWhite"
+                    android:fontFamily="@font/howdy_lemon"/>
+            </LinearLayout>
+
+            <!-- Brasil -->
+            <LinearLayout
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:src="@drawable/banderabrasil"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp" />
+
+                <CheckBox
+                    android:id="@+id/cbBrazil"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Brasil"
+                    android:textColor="@color/generalWhite"
+                    android:fontFamily="@font/howdy_lemon"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Botones -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="16dp"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnSaveSettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Guardar"
+                android:background="@drawable/rounded_style"/>
+
+            <Button
+                android:id="@+id/btnCancelSettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Cancelar"
+                android:background="@drawable/rounded_style"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

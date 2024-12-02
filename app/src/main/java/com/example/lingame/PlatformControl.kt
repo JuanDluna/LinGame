@@ -124,16 +124,16 @@ class PlatformControl @JvmOverloads constructor(
         Log.d("PlatformControl", "Category: $category")
         when (category) {
             "norte" -> {
-                setCardBackgroundColor(Color.RED)
+                setCardBackgroundColor(context.getColor(R.color.retorapido))
             }
             "este" -> {
-                setCardBackgroundColor(Color.YELLOW) // Color de fondo (puedes cambiarlo)
+                setCardBackgroundColor(context.getColor(R.color.parafrasea)) // Color de fondo (puedes cambiarlo)
             }
             "sur" -> {
-                setCardBackgroundColor(Color.GREEN) // Color de fondo (puedes cambiarlo)
+                setCardBackgroundColor(context.getColor(R.color.traducelo)) // Color de fondo (puedes cambiarlo)
             }
             "oeste" -> {
-                setCardBackgroundColor(Color.BLUE) // Color de fondo (puedes cambiarlo)
+                setCardBackgroundColor(context.getColor(R.color.createStory)) // Color de fondo (puedes cambiarlo)
             }
 
         }

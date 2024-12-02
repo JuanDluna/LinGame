@@ -50,7 +50,8 @@
                 android:layout_height="wrap_content"
                 android:text="Nivel: 1"
                 android:textSize="14sp"
-                android:textColor="@android:color/white" />
+                android:textColor="?attr/contrast"
+                android:fontFamily="@font/howdy_lemon"/>
             <!-- Nivel del jugador -->
 
             <!-- Barra de experiencia -->
@@ -60,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:progress="25"
                 android:progressDrawable="@drawable/progress_horizontal"
-                style="?android:attr/progressBarStyleHorizontal" />
+                style="?android:attr/progressBarStyleHorizontal"/>
 
             <!-- Botón de selección de idioma (centrado verticalmente) -->
             <com.example.lingame.ButtonDropdownMenu
@@ -93,6 +94,6 @@
             android:src="@drawable/menu_64"
             android:contentDescription="Menu Button"
             android:background="@drawable/dropdown_background" />
-
     </LinearLayout>
+
 </FrameLayout>

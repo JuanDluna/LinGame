@@ -22,4 +22,9 @@
     <color name="red">#F44336</color>
     <color name="teal_200">#80CBC4</color>
 
+    <!-- Colores de categorias  -->
+    <color name="parafrasea">#4CAF50</color>
+    <color name="retorapido">#FF0000</color>
+    <color name="createStory">#2196F3</color>
+    <color name="traducelo">#FFEB3B</color>
 </resources>

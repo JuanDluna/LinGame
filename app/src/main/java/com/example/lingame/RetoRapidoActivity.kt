@@ -1,6 +1,7 @@
 package com.example.lingame
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
@@ -24,9 +25,20 @@ class RetoRapidoActivity : FragmentActivity() {
     private var questionsList = mutableListOf<Question>()
     private var currentQuestionIndex = 0 // Control del índice de la pregunta actual
 
+    // Base de datos
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var dbHelper : DBSQLite
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reto_rapido)
+
+        // Inicializar base de datos
+        dbHelper = DBSQLite(this)
+        sharedPreferences = getSharedPreferences(
+            getString(R.string.sharedPreferencesName),
+            MODE_PRIVATE
+        )
 
         // Inicializar Firebase Database
         database = FirebaseDatabase.getInstance().reference.child("languages").child("reto_rapido")
@@ -119,10 +131,19 @@ class RetoRapidoActivity : FragmentActivity() {
                 timer.text = String.format("%02d:%02d", minutes, remainingSeconds)
             }
             if (seconds == 0){
-                Toast.makeText(this@RetoRapidoActivity, "¡Fin del juego!", Toast.LENGTH_SHORT).show()
+
+                val UID = sharedPreferences.getString(getString(R.string.UID_Preferences), null)
+                val actualLanguage = sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)
+                val actualCategory = getString(R.string.retoRapido)
+                val increment = scoreBar.getScore() / 10000F
+
+                // Actualizar la base de datos
+                dbHelper.updateLevelsByCategory(UID!!, actualLanguage!!, actualCategory, increment);
+
                 var intent = Intent()
                 intent.putExtra("win", scoreBar.isFirstStarReached())
                 setResult(RESULT_OK, intent)
+                GameLogicaActivity().initHudElements()
                 finish()
             }
         }

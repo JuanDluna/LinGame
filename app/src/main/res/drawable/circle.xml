@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Color del borde -->
+    <solid android:color="@android:color/transparent"/> <!-- Color de fondo transparente -->
+
+    <!-- Definir el borde del círculo -->
+    <stroke
+        android:color="@android:color/white"
+        android:width="2dp" /> <!-- Grosor del borde -->
+
+    <!-- Definir el radio del círculo -->
+    <size
+        android:width="48dp"
+        android:height="48dp" />
+
+    <!-- Rellenar el centro con color transparente para que sea hueco -->
+    <corners android:radius="24dp" /> <!-- Radio del círculo -->
+</shape>

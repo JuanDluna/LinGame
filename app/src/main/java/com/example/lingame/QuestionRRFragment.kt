@@ -125,7 +125,14 @@ class QuestionRRFragment : Fragment() {
             view.findViewById(R.id.answerButton4)
         )
 
-        val selectedLanguage =  sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)// Cambiar esto según la lógica de selección de idioma
+        var selectedLanguage =  sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)// Cambiar esto según la lógica de selección de idioma
+        selectedLanguage = when (selectedLanguage) {
+            getString(R.string.englishValuePreferences) -> "en"
+            getString(R.string.frenchValuePreferences) -> "fr"
+            getString(R.string.portugueseValuePreferences) -> "pr"
+            else -> "es"
+        }
+
         questionTextView.text = question.getQuestionInLanguage(selectedLanguage!!)
 
         val answers = question.getAnswersShuffled()

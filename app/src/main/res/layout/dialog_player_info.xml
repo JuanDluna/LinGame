@@ -1,0 +1,63 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/rounded_background"
+    android:backgroundTint="?attr/colorPrimary">
+
+    <ImageView
+        android:id="@+id/ivCloseFragmentPI"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/close_64"
+        android:background="@drawable/btn_close"
+        android:layout_gravity="end"
+        />
+
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivProfileFragmentPI"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="8dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/avatar_base"
+        android:background="@color/generalWhite"
+        app:shapeAppearanceOverlay="@style/RoundedCornerImage"
+        android:contentDescription="Player Avatar"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:id="@+id/tvNameFragmentPI"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="Player Name"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:textColor="@color/generalWhite"
+        android:fontFamily="@font/howdy_lemon"/>
+
+    <ProgressBar
+        android:id="@+id/progressBarFragmentPI"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center"
+        android:progress="25"
+        android:progressDrawable="@drawable/progress_horizontal"
+        style="?android:attr/progressBarStyleHorizontal" />
+
+    <TextView
+        android:id="@+id/tvProgressFragmentPI"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/generalWhite"
+        android:text="Nivel X - XX% completado"
+        android:fontFamily="@font/howdy_lemon"/>
+</LinearLayout>

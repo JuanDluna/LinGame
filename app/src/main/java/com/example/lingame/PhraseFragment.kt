@@ -53,6 +53,7 @@ class PhraseFragment : Fragment() {
 
     private val selectedWords = mutableListOf<String>()
     private var wordsOfPhrase = mutableListOf<String>()
+    private var isCorrect : Boolean = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -130,7 +131,7 @@ class PhraseFragment : Fragment() {
             nextButton.text = "Siguiente frase"
         } else {
             // Pasar a la siguiente frase
-            (activity as? ParafraseaActivity)?.onPhraseCompleted(true)
+            (activity as? ParafraseaActivity)?.onPhraseCompleted(isCorrect)
         }
     }
 
@@ -153,13 +154,15 @@ class PhraseFragment : Fragment() {
                     ContextCompat.getColor(
                         requireContext(),
                         if (index < userWords.size && userWords[index] == word) {
-                            android.R.color.holo_green_dark // Correcta
+                            android.R.color.holo_green_dark
                         } else {
-                            android.R.color.holo_red_dark // Incorrecta
+                            android.R.color.holo_red_dark;
                         }
                     )
                 )
             }
+            // Si una sola palabra esta mal la respuesta esta incorrecta, en caso contrario se mantiene el true de que todo esta correcto
+            if (userWords[index] != word ) isCorrect = false
             wordContainer.addView(button)
         }
     }

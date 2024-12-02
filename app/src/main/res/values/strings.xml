@@ -7,12 +7,24 @@
     <string name="fb_login_protocol_scheme">fb1234</string>
     <string name="facebook_client_token">9067c792f3f58c8d1a12250686b2deb1</string>
 
+    <string name="info">Informacion</string>
+    <string name="settings">Ajustes</string>
+    <string name="exit">Salir</string>
+
+    <string name="creaTuHistoria">CreaTuHistoria</string>
+    <string name="retoRapido">RetoRapido</string>
+    <string name="traducelo">Tradúcelo</string>
+    <string name="parafrasea">Para-frasea</string>
+
     <string name="sharedPreferencesName">LingamePreferences</string>
     <string name="isLoggedInPreferences">isLoggedIn</string>
     <string name="UID_Preferences">UID</string>
     <string name="selectedLanguagePreferences">selectedLanguage</string>
     <string name="listOfLanguagesPreferences">listLanguages</string>
-    <string name="englishValuePreferences">en</string>
-    <string name="frenchValuePreferences">fr</string>
-    <string name="portugueseValuePreferences">pr</string>
+    <string name="englishValuePreferences">Inglés</string>
+    <string name="frenchValuePreferences">Francés</string>
+    <string name="portugueseValuePreferences">Portugués</string>
+    <string name="themePreferences">theme</string>
+    <string name="audioPreferences">audio</string>
+    <string name="vibrationPreferences">vibration</string>
 </resources>

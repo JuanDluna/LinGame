@@ -2,35 +2,38 @@ package com.example.lingame
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.res.Resources
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.provider.Settings.Global.getString
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     // Uso de base de datos local en caso de que no se pueda acceder a Firebase
     var FirebaseFS = FirebaseFirestore.getInstance()
+    var resources = Resources.getSystem()
 
     companion object {
-        private const val DATABASE_VERSION = 3  // Incrementamos la versión de la base de datos
-        private const val DATABASE_NAME = "lingame"
-        private const val TABLE_USERS = "users"
-        private const val TABLE_ENGLISH = "english_levels"
-        private const val TABLE_FRENCH = "french_levels"
-        private const val TABLE_PORTUGUESE = "portuguese_levels"
+        const val DATABASE_VERSION = 3  // Incrementamos la versión de la base de datos
+        const val DATABASE_NAME = "lingame"
+        const val TABLE_USERS = "users"
+        const val TABLE_ENGLISH = "english_levels"
+        const val TABLE_FRENCH = "french_levels"
+        const val TABLE_PORTUGUESE = "portuguese_levels"
 
         // Columnas de la tabla 'users'
-        private const val COLUMN_ID = "id"
-        private const val COLUMN_NAME = "name"
-        private const val COLUMN_EMAIL = "email"
-        private const val COLUMN_PHOTO_URL = "photo_url"
-        private const val COLUMN_GENERAL_LEVEL = "generalLevel"
+        const val COLUMN_ID = "id"
+        const val COLUMN_NAME = "name"
+        const val COLUMN_EMAIL = "email"
+        const val COLUMN_PHOTO_URL = "photo_url"
+        const val COLUMN_GENERAL_LEVEL = "generalLevel"
 
         // Columnas de las tablas de niveles de idiomas
-        private const val COLUMN_LEVEL_CREA_HISTORIA = "levelCreaHistoria"
-        private const val COLUMN_LEVEL_RR = "levelRR"
-        private const val COLUMN_LEVEL_TRADUCELO = "levelTraducelo"
-        private const val COLUMN_LEVEL_PARAFRASEA = "levelParafrasea"
+        const val COLUMN_LEVEL_CREA_HISTORIA = "levelCreaHistoria"
+        const val COLUMN_LEVEL_RR = "levelRR"
+        const val COLUMN_LEVEL_TRADUCELO = "levelTraducelo"
+        const val COLUMN_LEVEL_PARAFRASEA = "levelParafrasea"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -113,6 +116,66 @@ class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         }
         db.update(TABLE_USERS, values, "$COLUMN_ID = ?", arrayOf(UID))
     }
+
+    fun updateLevelsByCategory(UID: String, language: String, category: String, increment: Float): Boolean {
+        val db = this.writableDatabase
+        var success = false
+
+        try {
+            // Actualizar el nivel general del usuario
+            val currentGeneralLevel = getGeneralLevel(UID)
+            val newGeneralLevel = currentGeneralLevel + increment
+            val generalValues = ContentValues().apply {
+                put(COLUMN_GENERAL_LEVEL, newGeneralLevel)
+            }
+            db.update(TABLE_USERS, generalValues, "$COLUMN_ID = ?", arrayOf(UID))
+
+            // Seleccionar la tabla correspondiente al idioma
+            val tableName = when (language) {
+                resources.getString(R.string.englishValuePreferences) -> TABLE_ENGLISH
+                resources.getString(R.string.frenchValuePreferences) -> TABLE_FRENCH
+                resources.getString(R.string.portugueseValuePreferences) -> TABLE_PORTUGUESE
+                else -> null
+            }
+
+            if (tableName != null) {
+                // Obtener el nombre de la columna basado en la categoría
+                val columnName = when (category) {
+                    resources.getString(R.string.creaTuHistoria) -> COLUMN_LEVEL_CREA_HISTORIA
+                    resources.getString(R.string.retoRapido) -> COLUMN_LEVEL_RR
+                    resources.getString(R.string.traducelo) -> COLUMN_LEVEL_TRADUCELO
+                    resources.getString(R.string.parafrasea) -> COLUMN_LEVEL_PARAFRASEA
+                    else -> null
+                }
+
+                if (columnName != null) {
+                    // Obtener el nivel actual de la categoría
+                    val query = "SELECT $columnName FROM $tableName WHERE $COLUMN_ID = ?"
+                    val cursor = db.rawQuery(query, arrayOf(UID))
+                    var currentLevel = 0
+                    if (cursor.moveToFirst()) {
+                        currentLevel = cursor.getInt(cursor.getColumnIndexOrThrow(columnName))
+                    }
+                    cursor.close()
+
+                    // Actualizar el nivel en la categoría correspondiente
+                    val newLevel = currentLevel + increment.toInt()
+                    val categoryValues = ContentValues().apply {
+                        put(columnName, newLevel)
+                    }
+                    val rowsAffected = db.update(tableName, categoryValues, "$COLUMN_ID = ?", arrayOf(UID))
+                    success = rowsAffected > 0
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("DBSQLite", "Error actualizando niveles: ${e.message}")
+        } finally {
+            db.close()
+        }
+
+        return success
+    }
+
 
     // Método para obtener el nivel general del usuario
     fun getGeneralLevel(UID: String): Float {
@@ -260,6 +323,14 @@ class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, nul
             put(COLUMN_ID, UID)
         }
         db.insert(TABLE_PORTUGUESE, null, portugueseValues)
+    }
+
+    fun createTableLanguageIfDoestnExists(UID: String, language: String){
+        when(language){
+            "Inglés" -> createEnglishTable(UID)
+            "Francés" -> createFrenchTable(UID)
+            "Portugués" -> createPortugueseTable(UID)
+        }
     }
 
 }

@@ -45,8 +45,8 @@ class ButtonDropdownMenu : AppCompatImageButton {
             options.forEach { (key, drawable) ->
                 val button = ImageView(context).apply {
                     layoutParams = LinearLayout.LayoutParams(
-                        64.dpToPx(), // Tamaño fijo
-                        64.dpToPx()
+                        50.dpToPx(), // Tamaño fijo
+                        50.dpToPx()
                     )
                     setImageDrawable(drawable)
                     contentDescription = key

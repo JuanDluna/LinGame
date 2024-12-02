@@ -1,0 +1,19 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo del botón con el color primario -->
+    <solid android:color="?attr/colorPrimary"/>
+
+    <!-- Borde blanco -->
+    <stroke
+        android:color="#FFFFFF"
+        android:width="2dp" />
+
+    <!-- Esquinas redondeadas (circular) -->
+    <corners android:radius="50dp" />
+
+    <!-- Sombra (opcional) -->
+    <padding
+        android:left="10dp"
+        android:top="10dp"
+        android:right="10dp"
+        android:bottom="10dp" />
+</shape>
