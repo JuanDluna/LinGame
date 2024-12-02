@@ -1,8 +1,7 @@
 package com.example.lingame
 
 import android.os.Bundle
-import android.transition.AutoTransition
-import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,14 +11,27 @@ import androidx.fragment.app.Fragment
 
 class GameActivity : Fragment() {
 
+    private val levelsPassed = BooleanArray(4) { false }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflar el layout del fragmento
         val view = inflater.inflate(R.layout.activity_game, container, false)
 
-        // Mostrar las plataformas iniciales
+        // Example: Set the levelPassed status for each level
+        levelsPassed[0] = activity?.intent?.getBooleanExtra("levelPassed", false) ?: false
+        levelsPassed[1] = activity?.intent?.getBooleanExtra("levelPassed", false) ?: false
+        levelsPassed[2] = activity?.intent?.getBooleanExtra("levelPassed", false) ?: false
+        levelsPassed[3] = activity?.intent?.getBooleanExtra("levelPassed", false) ?: false
+
+        if (levelsPassed[0]) {
+            Log.d("GameActivity", "El nivel 1 ha sido pasado")
+        }
+//        if (levelsPassed.all { it }) {
+//            Log.d("GameActivity", "Todos los niveles han sido pasados")
+//        }
+
         showPlatforms(view, 1)  // Set 1 de plataformas
 
         return view
@@ -64,7 +76,6 @@ class GameActivity : Fragment() {
         constraintSet.connect(westPlatform.id, ConstraintSet.TOP, centralPlatformId, ConstraintSet.TOP)
         constraintSet.connect(westPlatform.id, ConstraintSet.BOTTOM, centralPlatformId, ConstraintSet.BOTTOM)
 
-
         // Aplicar las restricciones
         constraintSet.applyTo(constraintLayout)
     }
@@ -72,7 +83,8 @@ class GameActivity : Fragment() {
     private fun createPlatform(id: Int, category: String): PlatformControl {
         val platform = PlatformControl(requireContext()).apply {
             this.id = id
-            this.category = category  // Asignar la categoría a la plataforma (norte, sur, este, oeste)
+            this.category = category
+            this.levelPassed = this@GameActivity.levelsPassed[0] // Example: Use the first level's status
         }
         val params = ConstraintLayout.LayoutParams(250, 250)
         platform.layoutParams = params
