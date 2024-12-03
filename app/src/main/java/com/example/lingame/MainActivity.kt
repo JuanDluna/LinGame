@@ -19,14 +19,14 @@ class MainActivity : AppCompatActivity() {
     lateinit var sharedPreferences: SharedPreferences
 
     // Variable para usar en pruebas
-    private var debbugerMode = false
+    private var debbugerMode = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         if (debbugerMode) {
-            startActivity(Intent(this, GameActivity::class.java))
+            startActivity(Intent(this, TutorialActivity::class.java))
             return
         }
 
