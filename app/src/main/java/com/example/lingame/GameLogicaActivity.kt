@@ -63,7 +63,6 @@ class GameLogicaActivity : FragmentActivity() {
         experienceBar = findViewById(R.id.experienceBar)
         menuButton = findViewById(R.id.menuButton)
         languageSelector = findViewById(R.id.languageSelector)
-//        surfaceView = findViewById<SurfaceView>(R.id.gameSurfaceView)
 
         val UID = preferences.getString(getString(R.string.UID_Preferences), null)
         Log.d("GameLogicaActivity", "Usuario logueado: ${UID}")

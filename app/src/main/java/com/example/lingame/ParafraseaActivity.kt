@@ -2,7 +2,12 @@ package com.example.lingame
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.database.FirebaseDatabase
@@ -78,19 +83,7 @@ class ParafraseaActivity : FragmentActivity() {
 
     private fun showPhraseFragment() {
         if (phrasesList.isEndOfList() && !phrasesList.isEmpty()) {
-            val UID = sharedPreferences.getString(getString(R.string.UID_Preferences), null)
-            val actualLanguage = sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)
-            val actualCategory = getString(R.string.parafrasea)
-            val increment = scoreBar.getScore() / 10000F
-
-            // Actualizar la base de datos
-            dbHelper.updateLevelsByCategory(UID!!, actualLanguage!!, actualCategory, increment);
-
-            var intent = Intent()
-            intent.putExtra("win", scoreBar.isFirstStarReached())
-            setResult(RESULT_OK, intent)
-            GameLogicaActivity().initHudElements()
-            finish()
+            winnerView()
         } else {
             val nextPhrase = phrasesList.nextPhrase()
             val fragment = PhraseFragment.newInstance(nextPhrase)
@@ -110,5 +103,50 @@ class ParafraseaActivity : FragmentActivity() {
 
         // Mostrar la siguiente frase
         showPhraseFragment()
+    }
+
+    private fun winnerView(){
+        setContentView(R.layout.level_complete)
+        val button : Button = this.findViewById(R.id.btnContinuar)
+        var star1 : ImageView = this.findViewById(R.id.star1)
+        var star2 : ImageView = this.findViewById(R.id.star2)
+        var star3 : ImageView = this.findViewById(R.id.star3)
+        var score : TextView = this.findViewById(R.id.tvPuntaje)
+
+        score.text = "Puntaje: ${scoreBar.getScore()}"
+
+        if (scoreBar.isFirstStarReached()){
+            star1.drawable.setTint(Color.YELLOW)
+        }else{
+            star1.drawable.setTint(Color.GRAY)
+        }
+        if (scoreBar.isSecondStarReached()){
+            star2.drawable.setTint(Color.YELLOW)
+        }else{
+            star2.drawable.setTint(Color.GRAY)
+        }
+        if (scoreBar.isThirdStarReached()){
+            star3.drawable.setTint(Color.YELLOW)
+        }else{
+            star3.drawable.setTint(Color.GRAY)
+        }
+
+        Log.i("RetoRapidoActivity", "Primera estrella: ${scoreBar.isFirstStarReached()}")
+        if (scoreBar.isFirstStarReached()){
+            val UID = sharedPreferences.getString(getString(R.string.UID_Preferences), null)
+            val actualLanguage = sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)
+            val actualCategory = getString(R.string.parafrasea)
+            val increment = scoreBar.getScore() / 10000F
+            // Actualizar la base de datos
+            dbHelper.updateLevelsByCategory(UID!!, actualLanguage!!, actualCategory, increment);
+        }
+
+        button.setOnClickListener {
+            var intent = Intent()
+            intent.putExtra("win", scoreBar.isFirstStarReached())
+            setResult(RESULT_OK, intent)
+            finish()
+        }
+
     }
 }

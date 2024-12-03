@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.animation.LinearInterpolator
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -28,7 +29,6 @@ class PlatformControl @JvmOverloads constructor(
         val platformDiameter = 150f // Diámetro de la plataforma (ajustado para que sea más pequeña)
         radius = platformDiameter / 2 // Radio para hacer la forma circular
         cardElevation = 8f // Elevación constante
-        setCardBackgroundColor(Color.parseColor("#FF6200EE")) // Color de fondo (puedes cambiarlo)
         isClickable = true
         isFocusable = true
 
@@ -102,20 +102,37 @@ class PlatformControl @JvmOverloads constructor(
                     val intent = Intent(context, ParafraseaActivity::class.java)
                     context.startActivity(intent)
                 }
-                else -> {
-                    // Manejo de categorías no asignadas
+                "sur" -> {
+                    Log.i("PlatformControl", "Sur")
+                    val intent = Intent(context, CreaHistoriaActivity::class.java)
+                    context.startActivity(intent)
+                }
+                "oeste" -> {
+                    val intent = Intent(context, TraduceloActivity::class.java)
+                    context.startActivity(intent)
                 }
             }
         }
     }
 
-    private fun startForResult(intent: Intent) {
-
-    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         startLevitationAnimationWithDelay() // Inicia la animación con un retraso cuando el control es agregado a la vista
+        when (category) {
+            "norte" -> {
+                setCardBackgroundColor(context.getColor(R.color.retorapido))
+            }
+            "este" -> {
+                setCardBackgroundColor(context.getColor(R.color.parafrasea))
+            }
+            "sur" -> {
+                setCardBackgroundColor(context.getColor(R.color.createStory))
+            }
+            "oeste" -> {
+                setCardBackgroundColor(context.getColor(R.color.traducelo))
+            }
+        }
     }
 
     override fun onDetachedFromWindow() {

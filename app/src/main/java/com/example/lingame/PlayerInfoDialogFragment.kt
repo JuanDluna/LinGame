@@ -47,7 +47,7 @@ class PlayerInfoDialogFragment : DialogFragment() {
                 photoProfilePath = cursorDB.getString(cursorDB.getColumnIndexOrThrow(DBSQLite.COLUMN_PHOTO_URL))
 
                 Log.i("PlayerInfoDialogFragment", "Nombre del jugador: $playerName")
-                Log.i("PlayerInfoDialogFragment", "Nivel del jugador: $levelProgress")
+                Log.i("PlayerInfoDialogFragment", "Progreso para siguiente nivel: $levelProgress")
                 Log.i("PlayerInfoDialogFragment", "Nivel actual del jugador: $currentLevel")
                 Log.i("PlayerInfoDialogFragment", "Foto de perfil del jugador: $photoProfilePath")
             } catch (e: Exception) {

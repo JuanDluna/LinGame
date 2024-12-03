@@ -9,10 +9,11 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.provider.Settings.Global.getString
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+
+class DBSQLite(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     // Uso de base de datos local en caso de que no se pueda acceder a Firebase
     var FirebaseFS = FirebaseFirestore.getInstance()
-    var resources = Resources.getSystem()
+    var resources = context.resources
 
     companion object {
         const val DATABASE_VERSION = 3  // Incrementamos la versión de la base de datos
@@ -37,7 +38,6 @@ class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, nul
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        // Crear tabla de usuarios (incluyendo la columna generalLevel)
         db.execSQL(
             "CREATE TABLE $TABLE_USERS (" +
                     "$COLUMN_ID TEXT PRIMARY KEY," +
@@ -47,8 +47,6 @@ class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, nul
                     "$COLUMN_GENERAL_LEVEL REAL DEFAULT 0.0)"
         )
 
-        // Las tablas de idiomas se crean solo si el usuario tiene una relación con el idioma
-        // Crear tabla de inglés (si no existe)
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS $TABLE_ENGLISH (" +
                     "$COLUMN_ID TEXT PRIMARY KEY," +
@@ -59,7 +57,6 @@ class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, nul
                     "FOREIGN KEY($COLUMN_ID) REFERENCES $TABLE_USERS($COLUMN_ID))"
         )
 
-        // Crear tabla de francés (si no existe)
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS $TABLE_FRENCH (" +
                     "$COLUMN_ID TEXT PRIMARY KEY," +
@@ -70,7 +67,6 @@ class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, nul
                     "FOREIGN KEY($COLUMN_ID) REFERENCES $TABLE_USERS($COLUMN_ID))"
         )
 
-        // Crear tabla de portugués (si no existe)
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS $TABLE_PORTUGUESE (" +
                     "$COLUMN_ID TEXT PRIMARY KEY," +
@@ -100,6 +96,17 @@ class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, nul
             put(COLUMN_PHOTO_URL, photo_url)
             put(COLUMN_GENERAL_LEVEL, 0.0)  // Valor inicial de generalLevel
         }
+
+        val languageValues = ContentValues().apply {
+            put(COLUMN_ID, UID)
+            put(COLUMN_LEVEL_CREA_HISTORIA, 0)
+            put(COLUMN_LEVEL_RR, 0)
+            put(COLUMN_LEVEL_TRADUCELO, 0)
+            put(COLUMN_LEVEL_PARAFRASEA, 0)
+        }
+        db.insert(TABLE_ENGLISH, null, languageValues)
+        db.insert(TABLE_FRENCH, null, languageValues)
+        db.insert(TABLE_PORTUGUESE, null, languageValues)
 
         // Insertar usuario
         val userResult = db.insert(TABLE_USERS, null, userValues)
@@ -175,6 +182,53 @@ class DBSQLite(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, nul
 
         return success
     }
+
+    fun getLevelByCategoryAndLanguage(UID: String, language: String, category: String): Float {
+
+        val db = this.readableDatabase
+
+
+        // Determinar la tabla según el idioma
+        val tableName = when (language) {
+            resources.getString(R.string.englishValuePreferences) -> TABLE_ENGLISH
+            resources.getString(R.string.frenchValuePreferences) -> TABLE_FRENCH
+            resources.getString(R.string.portugueseValuePreferences) -> TABLE_PORTUGUESE
+            else -> {
+                Log.e("DBSQLite", "Idioma no válido: $language")
+                return 0.0f  // Devolver un valor predeterminado o lanzar un error
+            }
+        }
+
+
+        // Construir la consulta SQL
+        val query = "SELECT $category FROM $tableName WHERE $COLUMN_ID = ?"
+
+        try {
+            val cursor = db.rawQuery(query, arrayOf(UID))
+            var level = 0.0f
+
+            // Verificar si se obtuvo un resultado
+            if (cursor.moveToFirst()) {
+                // Comprobar si la columna 'category' existe en el cursor
+                val columnIndex = cursor.getColumnIndex(category)
+                if (columnIndex != -1) {
+                    level = cursor.getFloat(columnIndex)
+                } else {
+                    Log.e("DBSQLite", "Columna no encontrada: $category")
+                }
+            } else {
+                Log.e("DBSQLite", "No se encontró un registro para UID: $UID")
+            }
+
+            cursor.close()
+            Log.i("DBSQLite", "Level: $level")
+            return level
+        } catch (e: Exception) {
+            Log.e("DBSQLite", "Error en la consulta: ${e.message}")
+            return 0.0f  // Devolver un valor predeterminado en caso de error
+        }
+    }
+
 
 
     // Método para obtener el nivel general del usuario

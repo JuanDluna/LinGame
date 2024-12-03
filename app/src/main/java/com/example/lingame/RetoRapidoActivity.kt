@@ -2,8 +2,11 @@ package com.example.lingame
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.database.*
@@ -20,8 +23,8 @@ class RetoRapidoActivity : FragmentActivity() {
 
     private lateinit var scoreBar: scoreBar
     private lateinit var timer: TextView
-    private var seconds = 60
     private lateinit var database: DatabaseReference
+    private var seconds : Int = 0
     private var questionsList = mutableListOf<Question>()
     private var currentQuestionIndex = 0 // Control del índice de la pregunta actual
 
@@ -39,7 +42,6 @@ class RetoRapidoActivity : FragmentActivity() {
             getString(R.string.sharedPreferencesName),
             MODE_PRIVATE
         )
-
         // Inicializar Firebase Database
         database = FirebaseDatabase.getInstance().reference.child("languages").child("reto_rapido")
 
@@ -47,6 +49,25 @@ class RetoRapidoActivity : FragmentActivity() {
         timer = findViewById(R.id.timerRR)
         scoreBar = findViewById(R.id.scoreBarRR)
         scoreBar.setMaxScore(5000)
+        seconds = 60
+
+
+        // Obtener el nivel actual de la categoría
+
+        try{
+            val category = DBSQLite.COLUMN_LEVEL_RR
+            val UID = sharedPreferences.getString(getString(R.string.UID_Preferences), null)
+            val language = sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)
+
+            var currentLevel = dbHelper.getLevelByCategoryAndLanguage(UID!!, language!!, category)
+
+            seconds = 120 - (currentLevel * 10).toInt()
+
+            Log.i("RetoRapidoActivity", "Valores obtenidos: $category, $UID, $language")
+        }catch (e: Exception){
+            Log.e("RetoRapidoActivity", "Error al obtener los valores: ${e.message}")
+        }
+
         startTimer()
 
         // Cargar preguntas al iniciar
@@ -113,11 +134,7 @@ class RetoRapidoActivity : FragmentActivity() {
 
             currentQuestionIndex++
         } else if (currentQuestionIndex == questionsList.size  ) {
-            Toast.makeText(this, "¡Fin del juego!", Toast.LENGTH_SHORT).show()
-            var intent = Intent()
-            intent.putExtra("win", scoreBar.isFirstStarReached())
-            setResult(RESULT_OK, intent)
-            finish()
+            winnerView()
         }
     }
 
@@ -130,21 +147,9 @@ class RetoRapidoActivity : FragmentActivity() {
                 val remainingSeconds = seconds % 60
                 timer.text = String.format("%02d:%02d", minutes, remainingSeconds)
             }
-            if (seconds == 0){
+            if (seconds <= 0){
 
-                val UID = sharedPreferences.getString(getString(R.string.UID_Preferences), null)
-                val actualLanguage = sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)
-                val actualCategory = getString(R.string.retoRapido)
-                val increment = scoreBar.getScore() / 10000F
-
-                // Actualizar la base de datos
-                dbHelper.updateLevelsByCategory(UID!!, actualLanguage!!, actualCategory, increment);
-
-                var intent = Intent()
-                intent.putExtra("win", scoreBar.isFirstStarReached())
-                setResult(RESULT_OK, intent)
-                GameLogicaActivity().initHudElements()
-                finish()
+                winnerView()
             }
         }
     }
@@ -157,5 +162,50 @@ class RetoRapidoActivity : FragmentActivity() {
             seconds -= 10
         }
         showNextQuestion()
+    }
+
+    private fun winnerView(){
+        setContentView(R.layout.level_complete)
+        val button : Button = this.findViewById(R.id.btnContinuar)
+        var star1 : ImageView = this.findViewById(R.id.star1)
+        var star2 : ImageView = this.findViewById(R.id.star2)
+        var star3 : ImageView = this.findViewById(R.id.star3)
+        var score : TextView = this.findViewById(R.id.tvPuntaje)
+
+        score.text = "Puntaje: ${scoreBar.getScore()}"
+
+        if (scoreBar.isFirstStarReached()){
+            star1.drawable.setTint(Color.YELLOW)
+        }else{
+            star1.drawable.setTint(Color.GRAY)
+        }
+        if (scoreBar.isSecondStarReached()){
+            star2.drawable.setTint(Color.YELLOW)
+        }else{
+            star2.drawable.setTint(Color.GRAY)
+        }
+        if (scoreBar.isThirdStarReached()){
+            star3.drawable.setTint(Color.YELLOW)
+        }else{
+            star3.drawable.setTint(Color.GRAY)
+        }
+
+        Log.i("RetoRapidoActivity", "Primera estrella: ${scoreBar.isFirstStarReached()}")
+        if (scoreBar.isFirstStarReached()){
+            val UID = sharedPreferences.getString(getString(R.string.UID_Preferences), null)
+            val actualLanguage = sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)
+            val actualCategory = getString(R.string.retoRapido)
+            val increment = scoreBar.getScore() / 10000F
+            // Actualizar la base de datos
+            dbHelper.updateLevelsByCategory(UID!!, actualLanguage!!, actualCategory, increment);
+        }
+
+        button.setOnClickListener {
+            var intent = Intent()
+            intent.putExtra("win", scoreBar.isFirstStarReached())
+            setResult(RESULT_OK, intent)
+            finish()
+        }
+
     }
 }

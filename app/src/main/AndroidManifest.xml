@@ -55,6 +55,7 @@
         <activity android:name=".RetoRapidoActivity"/>
         <activity android:name=".ParafraseaActivity"     />
         <activity android:name=".TraduceloActivity"     />
+        <activity android:name=".CreaHistoriaActivity"     />
 
 
     </application>

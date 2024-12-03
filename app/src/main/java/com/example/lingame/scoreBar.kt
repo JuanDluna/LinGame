@@ -120,4 +120,10 @@ class scoreBar @JvmOverloads constructor(
     fun isFirstStarReached() : Boolean {
         return stars[0].isReached
     }
+    fun isSecondStarReached() : Boolean {
+        return stars[1].isReached
+    }
+    fun isThirdStarReached() : Boolean {
+        return stars[2].isReached
+    }
 }

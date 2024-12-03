@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var sharedPreferences: SharedPreferences
 
     // Variable para usar en pruebas
-    private var debbugerMode = true
+    private var debbugerMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
