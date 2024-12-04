@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="100dp"
+    android:viewportWidth="220"
+    android:viewportHeight="120">
+
+    <!-- Fondo del globo -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#CCCCCC"
+        android:strokeWidth="2"
+        android:pathData="M20,20 h180 a10,10 0 0 1 10,10 v60 a10,10 0 0 1 -10,10 h-160 l-20,20 v-20 h-10 a10,10 0 0 1 -10,-10 v-60 a10,10 0 0 1 10,-10 z" />
+</vector>

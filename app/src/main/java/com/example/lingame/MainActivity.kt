@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
 
         if (debbugerMode) {
-            startActivity(Intent(this, TutorialActivity::class.java))
+            startActivity(Intent(this, CreaHistoriaActivity::class.java))
             return
         }
 

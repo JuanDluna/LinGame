@@ -13,12 +13,6 @@ import androidx.appcompat.app.AppCompatDelegate
 
 class SettingsDialogFragment : DialogFragment() {
 
-    private lateinit var rbThemeSystem: RadioButton
-    private lateinit var rbThemeLight: RadioButton
-    private lateinit var rbThemeDark: RadioButton
-
-    private lateinit var switchVibration: Switch
-    private lateinit var switchAudio: Switch
 
     private lateinit var cbUSA: CheckBox
     private lateinit var cbFrance: CheckBox
@@ -51,11 +45,6 @@ class SettingsDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Inicializar vistas
-        rbThemeSystem = view.findViewById(R.id.rbThemeSystem)
-        rbThemeLight = view.findViewById(R.id.rbThemeLight)
-        rbThemeDark = view.findViewById(R.id.rbThemeDark)
-        switchVibration = view.findViewById(R.id.switchVibration)
-        switchAudio = view.findViewById(R.id.switchAudio)
         cbUSA = view.findViewById(R.id.cbUSA)
         cbFrance = view.findViewById(R.id.cbFrance)
         cbBrazil = view.findViewById(R.id.cbBrazil)
@@ -77,18 +66,7 @@ class SettingsDialogFragment : DialogFragment() {
     }
 
     private fun loadSettings() {
-        // Cargar tema
-        when (preferences.getString(getString(R.string.themePreferences), "system")) {
-            "light" -> rbThemeLight.isChecked = true
-            "dark" -> rbThemeDark.isChecked = true
-            else -> rbThemeSystem.isChecked = true
-        }
 
-        // Cargar vibración
-        switchVibration.isChecked = preferences.getBoolean(getString(R.string.vibrationPreferences), true)
-
-        // Cargar audio
-        switchAudio.isChecked = preferences.getBoolean(getString(R.string.audioPreferences), true)
 
         // Cargar idiomas seleccionados
         val selectedLanguagesList = preferences.getStringSet(getString(R.string.listOfLanguagesPreferences), emptySet())
@@ -104,25 +82,6 @@ class SettingsDialogFragment : DialogFragment() {
     }
 
     private fun saveSettings() {
-        // Guardar tema
-        val selectedTheme = when {
-            rbThemeLight.isChecked -> "light"
-            rbThemeDark.isChecked -> "dark"
-            else -> "system"
-        }
-
-        // Aplicar el tema
-        when (selectedTheme) {
-            "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-        }
-
-        // Guardar vibración
-        val vibrationEnabled = switchVibration.isChecked
-
-        // Guardar audio
-        val audioEnabled = switchAudio.isChecked
 
         // Guardar idiomas seleccionados
         val selectedLanguages = mutableSetOf<String>()
@@ -147,9 +106,7 @@ class SettingsDialogFragment : DialogFragment() {
         // Guardar todos los valores en SharedPreferences
         preferences.edit()
             .putString(getString(R.string.selectedLanguagePreferences), selectedLanguage)
-            .putString(getString(R.string.themePreferences), selectedTheme)
-            .putBoolean(getString(R.string.vibrationPreferences), vibrationEnabled)
-            .putBoolean(getString(R.string.audioPreferences), audioEnabled)
+
             .putStringSet(getString(R.string.listOfLanguagesPreferences), selectedLanguages)
             .apply()
 
@@ -157,7 +114,7 @@ class SettingsDialogFragment : DialogFragment() {
 
 
         // Log para depuración
-        Log.i("SettingsDialogFragment", "Settings saved: Theme=$selectedTheme, Vibration=$vibrationEnabled, Audio=$audioEnabled, Languages=$selectedLanguages")
+        Log.i("SettingsDialogFragment", "Settings saved: Languages=$selectedLanguages")
     }
 
 }

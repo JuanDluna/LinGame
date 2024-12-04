@@ -64,6 +64,9 @@ class PlayerInfoDialogFragment : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        // Actualizar vista de padre
+        (activity as GameLogicaActivity)?.initHudElements()
+
         val builder = AlertDialog.Builder(requireContext())
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_player_info, null)
 

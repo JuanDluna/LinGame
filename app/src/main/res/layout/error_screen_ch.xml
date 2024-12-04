@@ -1,24 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center">
-    <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="Respuesta incorrecta. Intenta de nuevo."
-        />
-    <Button
-        android:id="@+id/btnRetryCH"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="Reintentar"  />
-    <Button
-        android:id="@+id/btnMainMenuCH"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="Menú principal"  />
-</LinearLayout>
+    tools:context=".DecisionFragment">
 
+    <ImageView
+        android:id="@+id/ivBackgroundCH_ErrorMessage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/story_creation_1_background"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <ImageView
+        android:id="@+id/ivCharacterCH_ErrorMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/story_creation_1_girl"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+
+    <!-- Mensaje de fallo -->
+    <TextView
+        android:id="@+id/tvFallaste"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_background"
+        android:text="Fallaste"
+        android:textColor="?attr/colorError"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="16dp"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tvErrorMessageCH"
+        android:padding="12dp" />
+
+<!--    Mensaje de error-->
+    <TextView
+        android:id="@+id/tvErrorMessageCH"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_bubble"
+        android:text="Oh no..."
+        android:textColor="@color/generalBlack"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="16dp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/tvFallaste"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/ivCharacterCH_ErrorMessage"
+        android:padding="12dp" />
+
+    <!-- Contenedor de botones -->
+    <LinearLayout
+        android:id="@+id/llAnswers"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/ivCharacterCH_ErrorMessage">
+
+        <!--Boton de reintentar-->
+        <Button
+            android:id="@+id/btnRetryCH"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginVertical="8dp"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="Reintentar"
+            android:textSize="16sp"
+            android:background="@drawable/button_background"
+            android:textColor="@color/generalBlack" />
+
+        <!--Salir a menu principal-->
+        <Button
+            android:id="@+id/btnMainMenuCH"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginVertical="8dp"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="Menu principal"
+            android:textSize="16sp"
+            android:background="@drawable/button_background"
+            android:textColor="@color/generalBlack" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

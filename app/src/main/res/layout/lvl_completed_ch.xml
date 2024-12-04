@@ -1,21 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center">
+    tools:context=".DecisionFragment">
 
+    <ImageView
+        android:id="@+id/ivBackgroundCH_levelSuccess"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/story_creation_1_background"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <ImageView
+        android:id="@+id/ivCharacterCH_levelSuccess"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/story_creation_1_girl"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+
+    <!-- Mensaje de fallo -->
     <TextView
+        android:id="@+id/tvNivelSuperado"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="¡Nivel superado!"/>
+        android:background="@drawable/rounded_background"
+        android:text="Nivel superado!"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="16dp"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/ivCharacterCH_levelSuccess"
+        android:padding="12dp" />
 
-    <Button
-        android:id="@+id/btnNextLevelCH"
-        android:layout_width="wrap_content"
+
+
+    <!-- Contenedor de botones -->
+    <LinearLayout
+        android:id="@+id/llAnswers"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Siguiente nivel"
-        />
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/ivCharacterCH_levelSuccess">
 
 
-</LinearLayout>
+        <!--Salir a menu principal-->
+        <Button
+            android:id="@+id/btnNextLevelCH"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginVertical="8dp"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="Siguiente nivel"
+            android:textSize="16sp"
+            android:background="@drawable/button_background"
+            android:textColor="@color/generalBlack" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -45,11 +45,7 @@ class RetoRapidoActivity : FragmentActivity() {
         // Inicializar Firebase Database
         database = FirebaseDatabase.getInstance().reference.child("languages").child("reto_rapido")
 
-        // Inicializar la UI
-        timer = findViewById(R.id.timerRR)
-        scoreBar = findViewById(R.id.scoreBarRR)
-        scoreBar.setMaxScore(5000)
-        seconds = 60
+
 
 
         // Obtener el nivel actual de la categoría
@@ -61,7 +57,12 @@ class RetoRapidoActivity : FragmentActivity() {
 
             var currentLevel = dbHelper.getLevelByCategoryAndLanguage(UID!!, language!!, category)
 
-            seconds = 120 - (currentLevel * 10).toInt()
+            // Inicializar la UI
+            timer = findViewById(R.id.timerRR)
+            scoreBar = findViewById(R.id.scoreBarRR)
+            scoreBar.setMaxScore(5000)
+
+            seconds = 90 - (currentLevel * 10).toInt()
 
             Log.i("RetoRapidoActivity", "Valores obtenidos: $category, $UID, $language")
         }catch (e: Exception){
@@ -165,8 +166,9 @@ class RetoRapidoActivity : FragmentActivity() {
     }
 
     private fun winnerView(){
+        clearCurrentFragment()
         setContentView(R.layout.level_complete)
-        val button : Button = this.findViewById(R.id.btnContinuar)
+        val button : Button = this.findViewById(R.id.btnContinuarLevelComplete)
         var star1 : ImageView = this.findViewById(R.id.star1)
         var star2 : ImageView = this.findViewById(R.id.star2)
         var star3 : ImageView = this.findViewById(R.id.star3)
@@ -190,7 +192,6 @@ class RetoRapidoActivity : FragmentActivity() {
             star3.drawable.setTint(Color.GRAY)
         }
 
-        Log.i("RetoRapidoActivity", "Primera estrella: ${scoreBar.isFirstStarReached()}")
         if (scoreBar.isFirstStarReached()){
             val UID = sharedPreferences.getString(getString(R.string.UID_Preferences), null)
             val actualLanguage = sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)
@@ -206,6 +207,14 @@ class RetoRapidoActivity : FragmentActivity() {
             setResult(RESULT_OK, intent)
             finish()
         }
-
+    }
+    private fun clearCurrentFragment() {
+        val fragmentManager = supportFragmentManager
+        val currentFragment = fragmentManager.findFragmentById(R.id.fragment_container)
+        if (currentFragment != null) {
+            fragmentManager.beginTransaction()
+                .remove(currentFragment)
+                .commit()
+        }
     }
 }

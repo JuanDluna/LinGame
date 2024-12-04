@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?attr/colorPrimary">
 
     <LinearLayout
@@ -62,15 +62,17 @@
             android:textSize="36dp"
             android:textColor="@color/generalWhite"
             android:fontFamily="@font/howdy_lemon"/>
+
         <Button
-            android:id="@+id/btnContinuar"
+            android:id="@+id/btnContinuarLevelComplete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Continuar"
             android:textSize="32dp"
-            android:textColor="?attr/colorPrimary"
             android:fontFamily="@font/howdy_lemon"
-            android:background="@drawable/rounded_background"/>
+            android:background="@drawable/rounded_background"
+            android:backgroundTint="@color/generalWhite"
+            android:textColor="@color/generalBlack"/>
 
     </LinearLayout>
 

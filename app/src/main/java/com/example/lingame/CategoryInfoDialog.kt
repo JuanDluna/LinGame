@@ -24,7 +24,7 @@ class CategoryInfoDialog : DialogFragment() {
     private lateinit var ivCloseCategory: ImageView
 
     private val categories: List<Pair<String, String>> = listOf(
-        "Crea tu historia" to "¡Prepárate para viajar a mundos mágicos! Completa las historias eligiendo las palabras correctas. ¡Usa tu imaginación y diviértete aprendiendo!",
+        "Crea tu historia" to "¡Explora conversaciones fascinantes en el idioma que estás aprendiendo! Elige las mejores respuestas usando tu dispositivo, mejora tu habilidad para tomar decisiones y diviértete mientras aprendes",
         "Reto rápido" to "¡Es un reto rápido! Responde lo más rápido que puedas a las preguntas. ¡Gana puntos y demuestra lo mucho que sabes, pero cuidado que si respondes mal, pierdes tiempo!. ¡Vamos, tú puedes!",
         "Tradúcelo" to "¡Es hora de aprender nuevas palabras! Mira la palabra que aparece y elige la traducción correcta. ¡No te preocupes, es muy fácil!",
         "Para-frasea" to "Aquí vas a formar oraciones. Selecciona las palabras en el orden correcto para hacer una frase. ¡Verás que es muy divertido aprender a hablar en otro idioma!"

@@ -1,13 +1,18 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo del ProgressBar -->
     <item android:id="@android:id/background">
         <shape android:shape="rectangle">
             <solid android:color="#CCCCCC" />
+            <corners android:radius="16dp" /> <!-- Radio para esquinas redondeadas -->
         </shape>
     </item>
+
+    <!-- Barra de progreso -->
     <item android:id="@android:id/progress">
         <clip>
             <shape android:shape="rectangle">
                 <solid android:color="@color/secundaryWhite" />
+                <corners android:radius="16dp" /> <!-- Radio para esquinas redondeadas -->
             </shape>
         </clip>
     </item>

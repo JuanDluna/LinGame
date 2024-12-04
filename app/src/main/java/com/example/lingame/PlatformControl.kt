@@ -3,15 +3,18 @@ package com.example.lingame
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
 import android.view.animation.LinearInterpolator
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.card.MaterialCardView
+
 
 class PlatformControl @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -20,7 +23,7 @@ class PlatformControl @JvmOverloads constructor(
     var category: String? = null // Atributo para la categoría (norte, sur, este, oeste)
     var targetActivity: Class<out FragmentActivity>? = null // Atributo para targetActivity
     var targetFragment: Class<out Fragment>? = null // Atributo para targetFragment
-    var levelPassed: Boolean = false
+    var levelPassed = false // Atributo para rastrear si el nivel ha pasado
 
     private var animator: ValueAnimator? = null
 
@@ -103,7 +106,6 @@ class PlatformControl @JvmOverloads constructor(
                     context.startActivity(intent)
                 }
                 "sur" -> {
-                    Log.i("PlatformControl", "Sur")
                     val intent = Intent(context, CreaHistoriaActivity::class.java)
                     context.startActivity(intent)
                 }
@@ -114,6 +116,10 @@ class PlatformControl @JvmOverloads constructor(
             }
         }
     }
+
+
+
+
 
 
     override fun onAttachedToWindow() {

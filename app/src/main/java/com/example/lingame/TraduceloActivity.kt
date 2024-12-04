@@ -143,8 +143,9 @@ class TraduceloActivity : AppCompatActivity() {
     }
 
     private fun winnerView(){
+        clearCurrentFragment()
         setContentView(R.layout.level_complete)
-        val button : Button = this.findViewById(R.id.btnContinuar)
+        val button : Button = this.findViewById(R.id.btnContinuarLevelComplete)
         var star1 : ImageView = this.findViewById(R.id.star1)
         var star2 : ImageView = this.findViewById(R.id.star2)
         var star3 : ImageView = this.findViewById(R.id.star3)
@@ -168,7 +169,6 @@ class TraduceloActivity : AppCompatActivity() {
             star3.drawable.setTint(Color.GRAY)
         }
 
-        Log.i("RetoRapidoActivity", "Primera estrella: ${scoreBar.isFirstStarReached()}")
         if (scoreBar.isFirstStarReached()){
             val UID = sharedPreferences.getString(getString(R.string.UID_Preferences), null)
             val actualLanguage = sharedPreferences.getString(getString(R.string.selectedLanguagePreferences), null)
@@ -185,5 +185,15 @@ class TraduceloActivity : AppCompatActivity() {
             finish()
         }
 
+    }
+
+    private fun clearCurrentFragment() {
+        val fragmentManager = supportFragmentManager
+        val currentFragment = fragmentManager.findFragmentById(R.id.fragment_container)
+        if (currentFragment != null) {
+            fragmentManager.beginTransaction()
+                .remove(currentFragment)
+                .commit()
+        }
     }
 }

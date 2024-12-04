@@ -50,30 +50,30 @@ class DBSQLite(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS $TABLE_ENGLISH (" +
                     "$COLUMN_ID TEXT PRIMARY KEY," +
-                    "$COLUMN_LEVEL_CREA_HISTORIA INTEGER DEFAULT 0," +
-                    "$COLUMN_LEVEL_RR INTEGER DEFAULT 0," +
-                    "$COLUMN_LEVEL_TRADUCELO INTEGER DEFAULT 0," +
-                    "$COLUMN_LEVEL_PARAFRASEA INTEGER DEFAULT 0," +
+                    "$COLUMN_LEVEL_CREA_HISTORIA INTEGER DEFAULT 1," +
+                    "$COLUMN_LEVEL_RR REAL DEFAULT 0.0," +
+                    "$COLUMN_LEVEL_TRADUCELO REAL DEFAULT 0.0," +
+                    "$COLUMN_LEVEL_PARAFRASEA REAL DEFAULT 0.0," +
                     "FOREIGN KEY($COLUMN_ID) REFERENCES $TABLE_USERS($COLUMN_ID))"
         )
 
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS $TABLE_FRENCH (" +
                     "$COLUMN_ID TEXT PRIMARY KEY," +
-                    "$COLUMN_LEVEL_CREA_HISTORIA INTEGER DEFAULT 0," +
-                    "$COLUMN_LEVEL_RR INTEGER DEFAULT 0," +
-                    "$COLUMN_LEVEL_TRADUCELO INTEGER DEFAULT 0," +
-                    "$COLUMN_LEVEL_PARAFRASEA INTEGER DEFAULT 0," +
+                    "$COLUMN_LEVEL_CREA_HISTORIA INTEGER DEFAULT 1," +
+                    "$COLUMN_LEVEL_RR REAL DEFAULT 0.0," +
+                    "$COLUMN_LEVEL_TRADUCELO REAL DEFAULT 0.0," +
+                    "$COLUMN_LEVEL_PARAFRASEA REAL DEFAULT 0.0," +
                     "FOREIGN KEY($COLUMN_ID) REFERENCES $TABLE_USERS($COLUMN_ID))"
         )
 
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS $TABLE_PORTUGUESE (" +
                     "$COLUMN_ID TEXT PRIMARY KEY," +
-                    "$COLUMN_LEVEL_CREA_HISTORIA INTEGER DEFAULT 0," +
-                    "$COLUMN_LEVEL_RR INTEGER DEFAULT 0," +
-                    "$COLUMN_LEVEL_TRADUCELO INTEGER DEFAULT 0," +
-                    "$COLUMN_LEVEL_PARAFRASEA INTEGER DEFAULT 0," +
+                    "$COLUMN_LEVEL_CREA_HISTORIA INTEGER DEFAULT 1," +
+                    "$COLUMN_LEVEL_RR REAL DEFAULT 0.0," +
+                    "$COLUMN_LEVEL_TRADUCELO REAL DEFAULT 0.0," +
+                    "$COLUMN_LEVEL_PARAFRASEA REAL DEFAULT 0.0," +
                     "FOREIGN KEY($COLUMN_ID) REFERENCES $TABLE_USERS($COLUMN_ID))"
         )
     }
@@ -99,10 +99,10 @@ class DBSQLite(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         val languageValues = ContentValues().apply {
             put(COLUMN_ID, UID)
-            put(COLUMN_LEVEL_CREA_HISTORIA, 0)
-            put(COLUMN_LEVEL_RR, 0)
-            put(COLUMN_LEVEL_TRADUCELO, 0)
-            put(COLUMN_LEVEL_PARAFRASEA, 0)
+            put(COLUMN_LEVEL_CREA_HISTORIA, 1)
+            put(COLUMN_LEVEL_RR, 0.0)
+            put(COLUMN_LEVEL_TRADUCELO, 0.0)
+            put(COLUMN_LEVEL_PARAFRASEA, 0.0)
         }
         db.insert(TABLE_ENGLISH, null, languageValues)
         db.insert(TABLE_FRENCH, null, languageValues)
@@ -131,11 +131,10 @@ class DBSQLite(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         try {
             // Actualizar el nivel general del usuario
             val currentGeneralLevel = getGeneralLevel(UID)
+
             val newGeneralLevel = currentGeneralLevel + increment
-            val generalValues = ContentValues().apply {
-                put(COLUMN_GENERAL_LEVEL, newGeneralLevel)
-            }
-            db.update(TABLE_USERS, generalValues, "$COLUMN_ID = ?", arrayOf(UID))
+
+            updateGeneralLevel(UID, newGeneralLevel)
 
             // Seleccionar la tabla correspondiente al idioma
             val tableName = when (language) {
@@ -159,14 +158,15 @@ class DBSQLite(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
                     // Obtener el nivel actual de la categoría
                     val query = "SELECT $columnName FROM $tableName WHERE $COLUMN_ID = ?"
                     val cursor = db.rawQuery(query, arrayOf(UID))
-                    var currentLevel = 0
+                    var currentLevel = 0F
                     if (cursor.moveToFirst()) {
-                        currentLevel = cursor.getInt(cursor.getColumnIndexOrThrow(columnName))
+                        Log.i("DBSQLite", "cursor: ${cursor.getFloat(cursor.getColumnIndexOrThrow(columnName))}")
+                        currentLevel = cursor.getFloat(cursor.getColumnIndexOrThrow(columnName))
                     }
                     cursor.close()
 
                     // Actualizar el nivel en la categoría correspondiente
-                    val newLevel = currentLevel + increment.toInt()
+                    val newLevel = currentLevel + increment
                     val categoryValues = ContentValues().apply {
                         put(columnName, newLevel)
                     }
@@ -180,6 +180,35 @@ class DBSQLite(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             db.close()
         }
 
+        return success
+    }
+
+    fun updateLevelCreateStory(UID: String, newLevel: Int, language: String): Boolean {
+        val db = this.writableDatabase
+        var success = false
+        try {
+            val tableName = when (language) {
+                resources.getString(R.string.englishValuePreferences) -> TABLE_ENGLISH
+                resources.getString(R.string.frenchValuePreferences) -> TABLE_FRENCH
+                resources.getString(R.string.portugueseValuePreferences) -> TABLE_PORTUGUESE
+                else -> {
+                    Log.e("DBSQLite", "Idioma no válido: $language")
+                    return false
+                }
+            }
+            val categoryValues = ContentValues().apply {
+                put(COLUMN_LEVEL_CREA_HISTORIA, newLevel)
+            }
+            val rowsAffected = db.update(tableName, categoryValues, "$COLUMN_ID = ?", arrayOf(UID))
+            success = rowsAffected > 0
+
+        }
+        catch (e: Exception){
+            Log.e("DBSQLite", "Error actualizando niveles: ${e.message}")
+        }
+        finally {
+            db.close()
+        }
         return success
     }
 
@@ -229,7 +258,27 @@ class DBSQLite(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         }
     }
 
+    fun getLevelCreateStoryByLanguage(UID: String, language: String): Int {
+        val db = this.readableDatabase
+        val tableName = when (language) {
+            resources.getString(R.string.englishValuePreferences) -> TABLE_ENGLISH
+            resources.getString(R.string.frenchValuePreferences) -> TABLE_FRENCH
+            resources.getString(R.string.portugueseValuePreferences) -> TABLE_PORTUGUESE
+            else -> {
+                Log.e("DBSQLite", "Idioma no válido: $language")
+                return 0
+            }
+        }
+        val query = "SELECT $COLUMN_LEVEL_CREA_HISTORIA FROM $tableName WHERE $COLUMN_ID = ?"
+        val cursor = db.rawQuery(query, arrayOf(UID))
 
+        var level = 0
+        if (cursor.moveToFirst()) {
+            level = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LEVEL_CREA_HISTORIA))
+        }
+        cursor.close()
+        return level
+    }
 
     // Método para obtener el nivel general del usuario
     fun getGeneralLevel(UID: String): Float {

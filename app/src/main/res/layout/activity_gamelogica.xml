@@ -92,8 +92,7 @@
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:src="@drawable/menu_64"
-            android:contentDescription="Menu Button"
-            android:background="@drawable/dropdown_background" />
+            android:contentDescription="Menu Button" />
     </LinearLayout>
 
 </FrameLayout>
